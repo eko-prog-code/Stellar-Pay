@@ -1,200 +1,71 @@
 import React, { Component } from 'react';
 import SendButton from './SendButton';
-
-const styles = `
-.wallet-container {
-  padding: 16px;
-  max-width: 100%;
-  margin: 0 auto;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #121212;
-  color: #fff;
-}
-
-.wallet-header {
-  text-align: center;
-  padding: 20px 0;
-  margin-bottom: 24px;
-}
-
-.wallet-title {
-  font-size: 32px;
-  font-weight: bold;
-  color: #ffffff;
-}
-
-.company-name {
-  color: #ff4500;
-  margin: 5px 0;
-  font-size: 18px;
-}
-
-.public-key-section {
-  background: #333;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  position: relative;
-  word-break: break-all;
-}
-
-.public-key {
-  color: #1e90ff;
-  font-weight: bold;
-}
-
-.copy-button {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  font-size: 22px;
-  color: #fff;
-  cursor: pointer;
-}
-
-.copy-button:hover {
-  opacity: 0.8;
-}
-
-.action-buttons {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.button {
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.button-primary {
-  background-color: #007bff; /* Solid blue for refresh button */
-  color: white;
-}
-
-.button:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-.balance-card {
-  background: #222;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.balance-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.asset-code {
-  font-weight: bold;
-  font-size: 20px;
-  color: #ff4500;
-}
-
-.balance-amount {
-  font-size: 26px;
-  color: #28a745;
-  margin: 10px 0;
-}
-
-@media (min-width: 768px) {
-  .wallet-container {
-    max-width: 768px;
-  }
-
-  .action-buttons {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  /* Hide wallet emoji on PC */
-  .wallet-footer .wallet-icon {
-    display: none;
-  }
-}
-
-.wallet-footer {
-  display: flex;
-  justify-content: space-between;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-}
-
-.wallet-footer .wallet-icon {
-  font-size: 40px;
-  color: #ff4500;
-}
-
-.wallet-footer .balance-icon {
-  font-size: 40px;
-  color: #ff6347;
-}
-
-/* Mobile Specific */
-@media (max-width: 767px) {
-  /* Move the copy button to the right bottom on mobile */
-  .copy-button {
-    right: 10px;
-    bottom: 10px;
-    transform: translateY(0);
-  }
-
-  /* Show wallet emoji only on mobile */
-  .wallet-footer .wallet-icon {
-    display: block;
-  }
-
-  /* Hide balance emoji on mobile */
-  .wallet-footer .balance-icon {
-    display: none;
-  }
-}
-`;
+import "./Wallet.css"
 
 class Wallet extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      copySuccess: false
+      copySuccess: false,
+      xlmPriceUSD: 0,
+      usdToIdr: 0,
+      showInIDR: false
     };
   }
 
   componentDidMount() {
     const styleSheet = document.createElement("style");
-    styleSheet.textContent = styles;
     document.head.appendChild(styleSheet);
+    this.fetchXLMPrice();
+    this.fetchCurrencyRates();
   }
+
+  fetchXLMPrice = async () => {
+    try {
+      const response = await fetch("https://api.coincap.io/v2/assets/stellar");
+      const data = await response.json();
+      this.setState({ xlmPriceUSD: parseFloat(data.data.priceUsd) });
+    } catch (error) {
+      console.error("Error fetching XLM price:", error);
+    }
+  };
+
+  fetchCurrencyRates = async () => {
+    try {
+      const response = await fetch("https://open.er-api.com/v6/latest/USD");
+      const data = await response.json();
+      this.setState({ usdToIdr: data.rates.IDR });
+    } catch (error) {
+      console.error("Error fetching currency rates:", error);
+    }
+  };
 
   copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
       this.setState({ copySuccess: true });
       setTimeout(() => this.setState({ copySuccess: false }), 2000);
     });
-  }
+  };
+
+  toggleCurrency = () => {
+    this.setState((prevState) => ({ showInIDR: !prevState.showInIDR }));
+  };
 
   render() {
     const mainBalance = this.props.balances.find(b => b.asset_type === 'native');
     const xlmBalance = mainBalance ? mainBalance.balance : '0';
+    const stellarchainBaseUrl = `https://stellarchain.io/accounts/${this.props.publicKey}`;
+    const { xlmPriceUSD, usdToIdr, showInIDR } = this.state;
+
+    const balanceInUSD = xlmBalance * xlmPriceUSD;
+    const balanceInIDR = balanceInUSD * usdToIdr;
+
+    const displayedBalance = showInIDR ? balanceInIDR.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) : `$${balanceInUSD.toFixed(2)}`;
 
     return (
       <div className="wallet-container">
         <header className="wallet-header">
-          <h1 className="wallet-title">🚀 InnoView Indo Tech</h1>
+          <h3 className="wallet-title">🚀 InnoView Indo Tech</h3>
           <p className="company-name">Stellar Wallet</p>
         </header>
 
@@ -206,6 +77,15 @@ class Wallet extends Component {
           >
             {this.state.copySuccess ? '✅' : '📋'}
           </button>
+          <a 
+            href={stellarchainBaseUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="stellarchain-link"
+            title="Lihat di Stellarchain"
+          >
+            🔗
+          </a>
         </div>
 
         <div className="action-buttons">
@@ -220,8 +100,17 @@ class Wallet extends Component {
         <div className="balance-card">
           <div className="balance-header">
             <span className="asset-code">XLM</span>
+            <button 
+              className="currency-toggle-button"
+              onClick={this.toggleCurrency}
+            >
+              {showInIDR ? 'Switch to USD' : 'Switch to IDR'}
+            </button>
           </div>
           <div className="balance-amount">{xlmBalance}</div>
+          <div className="converted-balance">
+            {displayedBalance}
+          </div>
           <SendButton 
             native={true}
             assetCode="XLM"

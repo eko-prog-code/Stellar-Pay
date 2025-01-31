@@ -1,0 +1,297 @@
+.wallet-container {
+  padding: 16px;
+  max-width: 100%;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #121212;
+  color: #fff;
+}
+
+.wallet-header {
+  text-align: center;
+  padding: 20px 0;
+  margin-bottom: 24px;
+}
+
+.wallet-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.company-name {
+  color: #ff4500;
+  margin: 5px 0;
+  font-size: 18px;
+}
+
+.public-key-section {
+  background: #333;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  position: relative;
+  word-break: break-all;
+}
+
+.public-key {
+  color: #1e90ff;
+  font-weight: bold;
+}
+
+.copy-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.copy-button:hover {
+  opacity: 0.8;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.button {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button-primary {
+  background-color: #007bff; /* Solid blue for refresh button */
+  color: white;
+}
+
+.button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.balance-card {
+  background: #222;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.balance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.asset-code {
+  font-weight: bold;
+  font-size: 20px;
+  color: #ff4500;
+}
+
+.balance-amount {
+  font-size: 26px;
+  color: #28a745;
+  margin: 10px 0;
+}
+
+@media (min-width: 768px) {
+  .wallet-container {
+    max-width: 768px;
+  }
+
+  .action-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Hide wallet emoji on PC */
+  .wallet-footer .wallet-icon {
+    display: none;
+  }
+}
+
+.wallet-footer {
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+.wallet-footer .wallet-icon {
+  font-size: 40px;
+  color: #ff4500;
+}
+
+.wallet-footer .balance-icon {
+  font-size: 40px;
+  color: #ff6347;
+}
+
+/* Mobile Specific */
+@media (max-width: 767px) {
+  /* Move the copy button to the right bottom on mobile */
+  .copy-button {
+    right: 10px;
+    bottom: 10px;
+    transform: translateY(0);
+  }
+
+  /* Show wallet emoji only on mobile */
+  .wallet-footer .wallet-icon {
+    display: block;
+  }
+
+  /* Hide balance emoji on mobile */
+  .wallet-footer .balance-icon {
+    display: none;
+  }
+}
+
+
+.transaction-card.incoming {
+    background-color: #e6f3e6; /* Light green for incoming transactions */
+  }
+  
+  .transaction-card.outgoing {
+    background-color: #f3e6e6; /* Light red for outgoing transactions */
+  }
+  
+  .transaction-filter {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  
+  .filter-button {
+    margin: 0 10px;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+  }
+  
+  .filter-button.active {
+    background-color: #007bff;
+    color: white;
+  }
+
+  /* Wallet.css */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Latar belakang semi-transparan */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Pastikan modal di atas elemen lain */
+}
+
+.modal-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+.transaction-filter {
+  margin-bottom: 20px;
+}
+
+.filter-button {
+  margin-right: 10px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filter-button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.transaction-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.transaction-card {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.transaction-card.incoming {
+  border-left: 4px solid green;
+}
+
+.transaction-card.outgoing {
+  border-left: 4px solid red;
+}
+
+.transaction-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.converted-balance {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.currency-toggle-button {
+  margin-left: 10px;
+  padding: 5px 10px; /* Mengurangi padding */
+  font-size: 14px; /* Mengurangi ukuran font */
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap; /* Mencegah teks menjadi dua baris */
+}
+
+.currency-toggle-button:hover {
+  background-color: #0056b3;
+}
+
+/* Media Query untuk Mobile Devices */
+@media (max-width: 768px) {
+  .currency-toggle-button {
+    padding: 3px 10px; /* Padding lebih kecil untuk mobile */
+    font-size: 14px; /* Ukuran font lebih kecil untuk mobile */
+    width: 40%;
+    margin-top: -8px;
+  }
+}

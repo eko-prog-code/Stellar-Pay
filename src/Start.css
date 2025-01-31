@@ -16,7 +16,7 @@ body {
 
 /* Default Input Styling */
 .private-key-input {
-  width: 96; /* Default untuk layar besar */
+  width: 96%; /* Default untuk layar besar */
   max-width: 400px; /* Batas maksimal di layar besar */
   padding: 12px;
   font-size: 1rem;
@@ -31,7 +31,7 @@ body {
 /* Mobile First: Input width 92% */
 @media (max-width: 600px) {
   .private-key-input {
-    width: 92%;
+    width: 98%;
     max-width: none; /* Hindari batasan lebar maksimum */
   }
 }
@@ -194,4 +194,10 @@ button + button {
   button + button {
     margin-top: 20px;
   }
-  
+
+  .rocket {
+    width: 60px;
+    height: 60px;
+    align-items: center;
+    margin-top: 16px;
+  }
