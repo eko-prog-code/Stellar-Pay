@@ -1,23 +1,88 @@
-/* Start.css */
-
 /* Global Styles */
 body {
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #121212;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #121212;
+  color: white;
+}
 
-  /* Mobile First */
+/* Mobile First */
 @media (max-width: 600px) {
-  body {
+  body, .container {
     padding-left: 14px;
     padding-right: 14px;
   }
+}
+
+/* Default Input Styling */
+.private-key-input {
+  width: 96; /* Default untuk layar besar */
+  max-width: 400px; /* Batas maksimal di layar besar */
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #2c2c2c;
+  color: white;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+/* Mobile First: Input width 92% */
+@media (max-width: 600px) {
+  .private-key-input {
+    width: 92%;
+    max-width: none; /* Hindari batasan lebar maksimum */
+  }
+}
+
+/* Focus state */
+.private-key-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 5px #3b82f6;
+}
+
+
+/* Form Container */
+.w-full {
+  width: 100%;
+  max-width: 400px;
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Input */
+input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #2c2c2c;
+  color: white;
+  outline: none;
+}
+
+input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 5px #3b82f6;
+}
+
+/* Button */
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button + button {
+  margin-top: 16px;
 }
   
   /* Container */

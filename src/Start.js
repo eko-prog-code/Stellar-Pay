@@ -20,7 +20,7 @@ class Start extends Component {
 
   render() {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-4">
+      <div className="container min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white px-4">
         <header className="w-full text-center py-6 border-b border-gray-700">
           <h1 className="text-4xl font-bold tracking-wide">
             🚀 Stellar Wallet
@@ -40,18 +40,18 @@ class Start extends Component {
             placeholder="Enter your private key..."
             value={this.state.privateKey}
             onChange={(e) => this.onChange(e)}
-            className="w-64 p-2 text-black rounded-md border-gray-600 focus:border-blue-400 focus:ring focus:ring-blue-300"
+            className="private-key-input"
           />
 
           <div className="mt-6 flex flex-col space-y-5">
             <button
-              className="w-full bg-blue-500 hover:bg-blue-400 p-2 rounded-md"
+              className="w-full bg-blue-500 hover:bg-blue-400 px-4 py-2 rounded-md"
               onClick={() => this.onSubmit(false)}
             >
               Open Wallet
             </button>
             <button
-              className="w-full bg-green-500 hover:bg-green-400 p-2 rounded-md"
+              className="w-full bg-green-500 hover:bg-green-400 px-4 py-2 rounded-md"
               onClick={() => this.onSubmit(true)}
             >
               Open TestNet Wallet
