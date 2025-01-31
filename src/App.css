@@ -1,28 +1,69 @@
+/* General styling */
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+  font-family: Arial, sans-serif;
+  padding: 10px;
 }
 
 .App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .App-title {
   font-size: 1.5em;
+  margin: 10px 0;
 }
 
-.App-intro {
-  font-size: large;
+button {
+  margin: 5px;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Mobile First */
+@media (max-width: 600px) {
+  .App-header h1 {
+    font-size: 1.2em;
+  }
+
+  .App-title {
+    font-size: 1.2em;
+  }
+
+  table {
+    width: 100%;
+    font-size: 0.9em;
+  }
+
+  table, th, td {
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 8px;
+    text-align: left;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+/* Larger screens */
+@media (min-width: 600px) {
+  .App-header h1 {
+    font-size: 1.8em;
+  }
+
+  .App-title {
+    font-size: 1.6em;
+  }
+
+  table {
+    width: 80%;
+    font-size: 1em;
+  }
+
+  button {
+    width: auto;
+  }
 }

@@ -1,16 +1,13 @@
-import React, { Component } from 'react';
-import {TextField, RaisedButton} from 'material-ui';
-import './App.css';
-import GenerateWalletButton from './GenerateWalletButton.js';
+import React, { Component } from "react";
+import GenerateWalletButton from "./GenerateWalletButton.js";
+import "./Start.css";
 
 class Start extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      privateKey: null,
+      privateKey: "",
     };
-
-    this.onChange = this.onChange.bind(this);
   }
 
   onSubmit(testnet) {
@@ -18,49 +15,55 @@ class Start extends Component {
   }
 
   onChange(event) {
-    this.setState({
-      privateKey: event.target.value,
-    });
+    this.setState({ privateKey: event.target.value });
   }
 
   render() {
-    var errorText = null;
-    if (this.props.error) {
-      errorText = "Invalid Private Key, try again.";
-    }
     return (
-      <div className="App">
-        <header className="App-header">
-          <h1><span role="img" aria-label="rocket">🚀</span></h1>
-          <h1 className="App-title">Astral Wallet</h1>
-          <a style={{color: 'white'}} href="https://github.com/reparadocs/AstralWallet">Github</a>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-4">
+        <header className="w-full text-center py-6 border-b border-gray-700">
+          <h1 className="text-4xl font-bold tracking-wide">
+            🚀 Stellar Wallet
+          </h1>
+          <a
+            className="text-blue-400 hover:text-blue-300 transition"
+            href="https://innoview.vercel.app"
+          >
+            by InnoView Indo Tech
+          </a>
         </header>
 
-        <TextField
-          hintText="(e.g. SDYKNZMYT6NE5EX6H3YZFGXMQ3R6NFR3YPX5RVM3L3DAK6RSA7KJI6CA)"
-          floatingLabelText="Private Key"
-          style={{width: 800}}
-          errorText={errorText}
-          onChange={this.onChange}
-        />
-        <br />
-        <RaisedButton
-          label="Open Wallet"
-          primary={true}
-          style={{marginTop: 10}}
-          onClick={() => {this.onSubmit(false);}}
-        />
-        <br />
-        <RaisedButton
-          label="Open TestNet Wallet"
-          secondary={true}
-          style={{marginTop: 30}}
-          onClick={() => {this.onSubmit(true);}}
-        />
-        <br />
-        <GenerateWalletButton
-          initializeWallet={this.props.initializeWallet}
-        />
+        <div className="mt-8 w-full max-w-md bg-gray-800 p-6 rounded-xl shadow-lg">
+          <label className="block text-sm font-medium mb-2">Private Key</label>
+          <input
+            type="text"
+            placeholder="Enter your private key..."
+            value={this.state.privateKey}
+            onChange={(e) => this.onChange(e)}
+            className="w-64 p-2 text-black rounded-md border-gray-600 focus:border-blue-400 focus:ring focus:ring-blue-300"
+          />
+
+          <div className="mt-6 flex flex-col space-y-5">
+            <button
+              className="w-full bg-blue-500 hover:bg-blue-400 p-2 rounded-md"
+              onClick={() => this.onSubmit(false)}
+            >
+              Open Wallet
+            </button>
+            <button
+              className="w-full bg-green-500 hover:bg-green-400 p-2 rounded-md"
+              onClick={() => this.onSubmit(true)}
+            >
+              Open TestNet Wallet
+            </button>
+          </div>
+
+          <div className="mt-6 text-center">
+            <GenerateWalletButton
+              initializeWallet={this.props.initializeWallet}
+            />
+          </div>
+        </div>
       </div>
     );
   }

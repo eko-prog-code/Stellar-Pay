@@ -1,125 +1,278 @@
-import React, { Component } from 'react';
-import {RaisedButton, FlatButton, Dialog, TextField} from 'material-ui';
-import './App.css';
+import React, { useState } from 'react';
 
-class SendButton extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      open: false,
-      destination: '',
-      memo: '',
-      amount: 0,
-      error: '',
-      success: '',
-      labelText: 'Submit',
-      disabled: false
-    };
+const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    destination: '',
+    memo: '',
+    amount: '',
+  });
+  const [status, setStatus] = useState({
+    loading: false,
+    error: '',
+    success: '',
+  });
 
-    this.sendAsset = this.sendAsset.bind(this);
-  }
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-  sendAsset() {
-    this.setState({labelText: 'Loading', disabled: true})
-    try {
-      var asset = window.StellarSDK.Asset.native();
-      if (!this.props.native) {
-        asset = new window.StellarSDK.Asset(this.props.assetCode, this.props.issuer);
-      }
-      this.props.server.loadAccount(this.props.pair.publicKey())
-        .then(function(account) {
-          var transaction = new window.StellarSDK.TransactionBuilder(account)
-          .addOperation(window.StellarSDK.Operation.payment({
-            asset: asset,
-            destination: this.state.destination,
-            amount: this.state.amount
-          }))
-          .addMemo(window.StellarSDK.Memo.text(this.state.memo))
-          .build();
-  
-          transaction.sign(this.props.pair);
-          return this.props.server.submitTransaction(transaction);
-        }.bind(this))
-        .then(function(result) {
-          this.setState({
-            labelText: "Success!",
-            success: "Sucess! You can close the window now",
-            error: ''
-          });
-        }.bind(this))
-        .catch(function(error) {
-          console.log(error.message);
-          this.setState({error: error.message, labelText: 'Submit', disabled: false, success: ''});
-        }.bind(this));
-      
-        this.props.refreshBalances();
-    } catch(error) {
-      console.log(error);
-      this.setState({error: error.message});
-    }
-  }
-
-  render() {
-    var actions = [
-      <FlatButton
-        label="Close"
-        default={true}
-        onClick={() => {this.setState({open: false, labelText: 'Submit', disabled: false, error: '', success: ''});}}
-      />,
-      <FlatButton
-        label={this.state.labelText}
-        primary={true}
-        onClick={this.sendAsset}
-        disabled={this.state.disabled}
-      />
-    ];
+  const handleSubmit = async () => {
+    setStatus({ loading: true, error: '', success: '' });
     
-    return (
-      <div>
-      <RaisedButton
-        label="Send"
-        primary={true}
-        onClick={() => {this.setState({open: true});}}
-      />
-      <Dialog
-        title={"Send " + this.props.assetCode}
-        actions={actions}
-        open={this.state.open}
-        modal={false}
-        onRequestClose={() => {this.setState({open: false, labelText: 'Submit', error: '', success: '', disabled: false})}}
-      >
-        <h3><b>Current Balance:</b> {this.props.amount}</h3>
-        <br />
-        <br />
-        Sending an asset will cost 0.00001 lumens.
-        <p style={{color: '#ff5468'}}>
-          {this.state.error}
-        </p>
-        <p style={{color: '#42f47a'}}>
-          {this.state.success}
-        </p>
-        <TextField
-          hintText="(e.g. GDYKNZMYT6NE5EX6H3YZFGXMQ3R6NFR3YPX5RVM3L3DAK6RSA7KJI6CA)"
-          floatingLabelText="Destination"
-          fullWidth={true}
-          onChange={(event) => {this.setState({destination: event.target.value});}}
-        />
-        <TextField
-          hintText="(e.g. Hi Friends! Welcome to Stellar)"
-          floatingLabelText="Memo (Optional)"
-          fullWidth={true}
-          onChange={(event) => {this.setState({memo: event.target.value});}}
-        />
-        <TextField
-          floatingLabelText="Amount"
-          fullWidth={true}
-          type="number"
-          onChange={(event) => {this.setState({amount: event.target.value});}}
-        />
-      </Dialog>
-      </div>
-    );
-  }
-}
+    try {
+      // Create native XLM asset
+      const asset = window.StellarSDK.Asset.native();
+      
+      // Load the sender's account
+      const account = await server.loadAccount(pair.publicKey());
+      
+      // Build the transaction
+      const transaction = new window.StellarSDK.TransactionBuilder(account)
+        .addOperation(window.StellarSDK.Operation.payment({
+          destination: formData.destination,
+          asset: asset,
+          amount: formData.amount.toString()
+        }))
+        .addMemo(window.StellarSDK.Memo.text(formData.memo || ''))
+        .build();
 
-export default SendButton;
+      // Sign and submit the transaction
+      transaction.sign(pair);
+      await server.submitTransaction(transaction);
+
+      setStatus({
+        loading: false,
+        error: '',
+        success: 'Transaction completed successfully! ✨'
+      });
+
+      // Reset form and close modal after success
+      setTimeout(() => {
+        setFormData({ destination: '', memo: '', amount: '' });
+        setStatus({ loading: false, error: '', success: '' });
+        setIsOpen(false);
+        refreshBalances();
+      }, 2000);
+
+    } catch (error) {
+      setStatus({
+        loading: false,
+        error: error.message,
+        success: ''
+      });
+    }
+  };
+
+  // Styles
+  const styles = {
+    container: {
+      display: 'inline-block',
+    },
+    modalOverlay: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+      display: isOpen ? 'flex' : 'none',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000,
+      animation: 'fadeIn 0.3s ease-in-out',
+    },
+    modalContent: {
+      backgroundColor: '#fff',
+      borderRadius: '12px',
+      padding: '20px',
+      width: '90%',
+      maxWidth: '500px',
+      maxHeight: '90vh',
+      overflow: 'auto',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      animation: 'slideIn 0.3s ease-in-out',
+    },
+    header: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: '20px',
+    },
+    title: {
+      margin: 0,
+      fontSize: '1.5rem',
+      color: '#333',
+    },
+    closeButton: {
+      background: 'none',
+      border: 'none',
+      fontSize: '1.5rem',
+      cursor: 'pointer',
+      color: '#666',
+      transition: 'color 0.2s ease-in-out',
+    },
+    closeButtonHover: {
+      color: '#333',
+    },
+    inputGroup: {
+      marginBottom: '15px',
+    },
+    label: {
+      display: 'block',
+      marginBottom: '5px',
+      fontWeight: '500',
+      color: '#555',
+    },
+    input: {
+      width: '100%',
+      padding: '10px 12px',
+      borderRadius: '6px',
+      border: '1px solid #ddd',
+      fontSize: '1rem',
+      transition: 'border-color 0.2s ease-in-out',
+    },
+    inputFocus: {
+      borderColor: '#0096FF',
+    },
+    button: {
+      backgroundColor: '#0096FF',
+      color: 'white',
+      border: 'none',
+      padding: '12px 20px',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      fontSize: '1rem',
+      width: '100%',
+      transition: 'background-color 0.2s ease-in-out',
+    },
+    buttonHover: {
+      backgroundColor: '#007acc',
+    },
+    error: {
+      color: '#dc3545',
+      marginBottom: '10px',
+      fontSize: '0.875rem',
+    },
+    success: {
+      color: '#28a745',
+      marginBottom: '10px',
+      fontSize: '0.875rem',
+    },
+    balanceInfo: {
+      fontSize: '0.875rem',
+      color: '#666',
+      marginBottom: '10px',
+    },
+    input: {
+      width: '100%',
+      padding: '10px 12px', // Tambahkan padding-right di sini
+      borderRadius: '6px',
+      border: '1px solid #ddd',
+      fontSize: '1rem',
+      transition: 'border-color 0.2s ease-in-out',
+      boxSizing: 'border-box', // Pastikan padding tidak menambah lebar input
+    },
+  };
+
+  return (
+    <div style={styles.container}>
+      <button 
+        onClick={() => setIsOpen(true)}
+        style={styles.button}
+        onMouseEnter={(e) => e.target.style.backgroundColor = styles.buttonHover.backgroundColor}
+        onMouseLeave={(e) => e.target.style.backgroundColor = styles.button.backgroundColor}
+      >
+        Send XLM 📤
+      </button>
+
+      <div style={styles.modalOverlay}>
+        <div style={styles.modalContent}>
+          <div style={styles.header}>
+            <h2 style={styles.title}>Send XLM</h2>
+            <button 
+              onClick={() => setIsOpen(false)}
+              style={styles.closeButton}
+              onMouseEnter={(e) => e.target.style.color = styles.closeButtonHover.color}
+              onMouseLeave={(e) => e.target.style.color = styles.closeButton.color}
+            >
+              ×
+            </button>
+          </div>
+
+          <div style={styles.inputGroup}>
+            <p style={styles.balanceInfo}>Current Balance: {balance} XLM</p>
+            <p style={styles.balanceInfo}>Transaction fee: 0.00001 XLM</p>
+          </div>
+
+          {status.error && (
+            <div style={styles.error}>{status.error}</div>
+          )}
+          
+          {status.success && (
+            <div style={styles.success}>{status.success}</div>
+          )}
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Destination Address</label>
+            <input
+              type="text"
+              name="destination"
+              value={formData.destination}
+              onChange={handleInputChange}
+              placeholder="GXXXXX..."
+              style={styles.input}
+              onFocus={(e) => e.target.style.borderColor = styles.inputFocus.borderColor}
+              onBlur={(e) => e.target.style.borderColor = styles.input.borderColor}
+            />
+          </div>
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Amount (XLM)</label>
+            <input
+              type="number"
+              name="amount"
+              value={formData.amount}
+              onChange={handleInputChange}
+              placeholder="0.0"
+              step="0.0000001"
+              min="0"
+              style={styles.input}
+              onFocus={(e) => e.target.style.borderColor = styles.inputFocus.borderColor}
+              onBlur={(e) => e.target.style.borderColor = styles.input.borderColor}
+            />
+          </div>
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Memo (Optional)</label>
+            <input
+              type="text"
+              name="memo"
+              value={formData.memo}
+              onChange={handleInputChange}
+              placeholder="Add a message"
+              style={styles.input}
+              onFocus={(e) => e.target.style.borderColor = styles.inputFocus.borderColor}
+              onBlur={(e) => e.target.style.borderColor = styles.input.borderColor}
+            />
+          </div>
+
+          <button
+            onClick={handleSubmit}
+            disabled={status.loading}
+            style={styles.button}
+            onMouseEnter={(e) => e.target.style.backgroundColor = styles.buttonHover.backgroundColor}
+            onMouseLeave={(e) => e.target.style.backgroundColor = styles.button.backgroundColor}
+          >
+            {status.loading ? 'Processing...' : 'Send XLM'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SendXLMModal;
