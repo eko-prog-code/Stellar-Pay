@@ -4,22 +4,13 @@
   padding: 10px;
 }
 
-.App-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.App-title {
-  font-size: 1.5em;
-  margin: 10px 0;
-}
-
-button {
-  margin: 5px;
-}
-
 /* Mobile First */
 @media (max-width: 600px) {
+  body {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
   .App-header h1 {
     font-size: 1.2em;
   }
@@ -50,6 +41,11 @@ button {
 
 /* Larger screens */
 @media (min-width: 600px) {
+  .App {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .App-header h1 {
     font-size: 1.8em;
   }
