@@ -11,6 +11,14 @@ body {
     align-items: center;
     height: 100vh;
   }
+
+  /* Mobile First */
+@media (max-width: 600px) {
+  body {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
   
   /* Container */
   .min-h-screen {

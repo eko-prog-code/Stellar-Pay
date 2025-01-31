@@ -17,3 +17,12 @@
       opacity: 1;
     }
   }
+
+  /* Mobile First */
+@media (max-width: 600px) {
+    body {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+  }
+  
