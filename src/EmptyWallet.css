@@ -167,8 +167,9 @@ button.bg-indigo-500:hover {
   .container {
       padding-left: 12px;
       padding-right: 12px;
+      margin-top: -30px; /* Mengangkat tampilan pada layar kecil */
   }
-  
+
   h3 {
       font-size: 2.5rem;
   }
