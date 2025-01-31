@@ -1,0 +1,182 @@
+/* ========== Global Styling ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #0a0f1c; /* Dark futuristic background */
+  color: white;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Wrapper agar tampilan responsive dengan padding tetap */
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  text-align: center;
+}
+
+/* Prevent scrolling sideways */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* ========== Futuristic Navigation Bar ========== */
+.navbar {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(30, 41, 59, 0.8); /* Glassmorphism effect */
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+}
+
+.navbar h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: cyan;
+  text-shadow: 0 0 5px cyan, 0 0 10px cyan;
+}
+
+.navbar .menu {
+  display: flex;
+  gap: 16px;
+}
+
+.navbar .menu a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.navbar .menu a:hover {
+  color: cyan;
+  text-shadow: 0 0 5px cyan;
+}
+
+/* Footer Navigation */
+.footer-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 12px 0;
+  text-align: center;
+  box-shadow: 0 -2px 15px rgba(0, 255, 255, 0.2);
+}
+
+.footer-nav p {
+  color: white;
+  font-size: 0.9rem;
+}
+
+/* ========== Header ========== */
+header {
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+h3 {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  color: cyan;
+  text-shadow: 0 0 8px cyan, 0 0 15px cyan;
+}
+
+/* ========== Form Container ========== */
+.form-container {
+  margin-top: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  background: rgba(31, 41, 55, 0.6); /* Glassmorphism */
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid cyan;
+}
+
+/* ========== Button Styling ========== */
+button {
+  margin-top: 1.5rem;
+  padding: 12px;
+  border-radius: 1rem;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button:disabled {
+  background-color: #4b5563; /* bg-gray-600 */
+  cursor: not-allowed;
+}
+
+button.bg-indigo-500 {
+  background-color: #00e0ff; /* Neon blue */
+  color: #0a0f1c;
+  box-shadow: 0 0 10px #00e0ff;
+}
+
+button.bg-indigo-500:hover {
+  background-color: #00b3cc;
+  box-shadow: 0 0 15px #00e0ff;
+}
+
+/* ========== Copy Public Key Button ========== */
+.copy-btn {
+  color: cyan;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.copy-btn:hover {
+  text-shadow: 0 0 8px cyan;
+}
+
+/* ========== Responsive Design ========== */
+@media (max-width: 600px) {
+  .container {
+      padding-left: 12px;
+      padding-right: 12px;
+  }
+  
+  h3 {
+      font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .container {
+      padding-left: 24px;
+      padding-right: 24px;
+  }
+}

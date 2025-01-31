@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import "./EmptyWallet.css";
 
 const Start = ({ initializeWallet, privateKey, testnet, publicKey }) => {
   const [loading, setLoading] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   const onSubmit = () => {
     setLoading(true);
@@ -9,43 +11,62 @@ const Start = ({ initializeWallet, privateKey, testnet, publicKey }) => {
     setTimeout(() => setLoading(false), 2000);
   };
 
-  // Format Public Key agar wrap jika lebih dari 36 karakter
   const formatPublicKey = (key) => {
-    if (key.length > 36) {
+    if (key.length > 26) {
       return (
-        <React.Fragment>
-          <span className="text-blue-400">{key.slice(0, 36)}</span>
+        <div>
+          <span className="text-blue-400">{key.slice(0, 26)}</span>
           <br />
-          <span className="text-blue-400">{key.slice(36)}</span>
-        </React.Fragment>
+          <span className="text-blue-400">{key.slice(26)}</span>
+        </div>
       );
     }
     return <span className="text-blue-400">{key}</span>;
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(publicKey).then(
+      () => setCopySuccess(true),
+      () => setCopySuccess(false)
+    );
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white px-6 md:px-20 w-full">
-      <header className="text-center w-full max-w-md">
-        <h1 className="text-6xl animate-pulse">🚀</h1>
-        <h1 className="text-3xl font-bold mt-2">Stellar Wallet</h1>
-        <p className="text-lg text-gray-400">InnoView Indo Tech</p>
-      </header>
-      
-      <div className="mt-6 text-justify w-full max-w-md bg-gray-800 bg-opacity-50 p-6 rounded-2xl shadow-lg backdrop-blur-md border border-gray-700">
-        <p className="text-gray-300">Dompet ini belum "nyata" karena belum memenuhi persyaratan saldo minimum. 😞</p>
-        <p className="text-gray-300 mt-2">
-          Send at least <span className="font-bold text-indigo-400">1 XLM</span> to {formatPublicKey(publicKey)} to make this wallet a reality!
-        </p>
-        <p className="text-gray-400 mt-4">Jika Anda telah mengirim lumens ke alamat tersebut, harap bersabar, tunggu beberapa detik, lalu tekan tombol 'Refresh'. 🙂</p>
+    <div>
+      {/* Navigation Bar */}
+      <div className="navbar">
+        <h2>🚀 Stellar Wallet</h2>
+        <div className="menu">
+          <a href="#">Home</a>
+          <a href="#">About</a>
+        </div>
       </div>
-      
-      <button 
-        className={`mt-6 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${loading ? 'bg-gray-600' : 'bg-indigo-500 hover:bg-indigo-700'}`} 
-        onClick={onSubmit} 
-        disabled={loading}
-      >
-        {loading ? 'Refreshing...' : 'Refresh'}
-      </button>
+
+      {/* Main Container */}
+      <div className="container">
+        <header>
+          <p>InnoView Indo Tech</p>
+        </header>
+
+        {/* Form Container */}
+        <div className="form-container">
+          <p>Dompet ini belum aktif, kirim 1 XLM ke alamat berikut:</p>
+          <p className="mt-2">{formatPublicKey(publicKey)}</p>
+
+          <button className="copy-btn" onClick={copyToClipboard}>
+            {copySuccess ? "✅ Berhasil!" : "💾 Salin Public Key"}
+          </button>
+        </div>
+
+        <button className="bg-indigo-500" onClick={onSubmit} disabled={loading}>
+          {loading ? "Refreshing..." : "Refresh"}
+        </button>
+      </div>
+
+      {/* Footer Navigation */}
+      <div className="footer-nav">
+        <p>© 2025 InnoView Indo Tech</p>
+      </div>
     </div>
   );
 };
