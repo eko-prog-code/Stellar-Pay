@@ -307,7 +307,7 @@ class Wallet extends Component {
                 className="button button-secondary"
                 onClick={() => this.setState({ scanResult: null })}
               >
-                Bersihkan
+                Tutup Bro !
               </button>
             </div>
             <p className="scan-hint">
