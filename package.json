@@ -3,20 +3,32 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@stellar/design-system": "^3.0.0",
+    "@stellar/design-system": "^3.1.2",
     "babel-runtime": "^5.0.0",
     "material-ui": "^0.20.0",
-    "qrcode.react": "^4.2.0",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
+    "qrcode.react": "3.1.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-qr-scanner": "^1.0.0-alpha.11",
-    "react-scripts": "1.0.17",
-    "stellar-sdk": "^13.1.0"
+    "react-scripts": "5.0.1",
+    "stellar-sdk": "^13.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
