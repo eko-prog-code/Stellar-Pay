@@ -1,6 +1,8 @@
-import React, { Component } from 'react';
-import SendButton from './SendButton';
-import "./Wallet.css"
+import React, { Component } from "react";
+import { QRCodeCanvas } from "qrcode.react";
+import QrScanner from "react-qr-scanner";
+import SendButton from "./SendButton";
+import "./Wallet.css";
 
 class Wallet extends Component {
   constructor(props) {
@@ -9,8 +11,13 @@ class Wallet extends Component {
       copySuccess: false,
       xlmPriceUSD: 0,
       usdToIdr: 0,
-      showInIDR: false
+      showInIDR: false,
+      scanResult: null,
+      showScanner: false,
+      qrSize: 200,
+      scanError: null,
     };
+    this.scannerRef = React.createRef();
   }
 
   componentDidMount() {
@@ -18,7 +25,19 @@ class Wallet extends Component {
     document.head.appendChild(styleSheet);
     this.fetchXLMPrice();
     this.fetchCurrencyRates();
+    this.updateQrSize();
+    window.addEventListener("resize", this.updateQrSize);
   }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateQrSize);
+  }
+
+  updateQrSize = () => {
+    const width = window.innerWidth;
+    const size = Math.min(200, width * 0.6);
+    this.setState({ qrSize: size });
+  };
 
   fetchXLMPrice = async () => {
     try {
@@ -51,16 +70,73 @@ class Wallet extends Component {
     this.setState((prevState) => ({ showInIDR: !prevState.showInIDR }));
   };
 
+  handleScan = (data) => {
+    if (data) {
+      try {
+        // Clean and normalize the scanned data
+        const scannedText = data.text.trim().toUpperCase();
+
+        // Validate Stellar public key format
+        if (/^G[A-Z0-9]{55}$/.test(scannedText)) {
+          this.setState({
+            scanResult: scannedText,
+            scanError: null,
+            showScanner: false,
+          });
+        } else {
+          throw new Error("Invalid Stellar public key format");
+        }
+      } catch (error) {
+        this.setState({
+          scanError:
+            "QR code tidak valid. Pastikan Anda memindai alamat Stellar (mulai dengan G, 56 karakter)",
+          scanResult: null,
+        });
+      }
+    }
+  };
+
+  handleError = (err) => {
+    console.error(err);
+    this.setState({
+      scanError:
+        "Gagal memindai QR code. Pastikan kamera dapat mengakses QR code.",
+    });
+  };
+
+  toggleScanner = () => {
+    this.setState((prevState) => ({
+      showScanner: !prevState.showScanner,
+      scanError: null,
+      scanResult: null,
+    }));
+  };
+
   render() {
-    const mainBalance = this.props.balances.find(b => b.asset_type === 'native');
-    const xlmBalance = mainBalance ? mainBalance.balance : '0';
+    const mainBalance = this.props.balances.find(
+      (b) => b.asset_type === "native"
+    );
+    const xlmBalance = mainBalance ? mainBalance.balance : "0";
     const stellarchainBaseUrl = `https://stellarchain.io/accounts/${this.props.publicKey}`;
-    const { xlmPriceUSD, usdToIdr, showInIDR } = this.state;
+    const {
+      xlmPriceUSD,
+      usdToIdr,
+      showInIDR,
+      scanResult,
+      showScanner,
+      qrSize,
+      scanError,
+    } = this.state;
 
     const balanceInUSD = xlmBalance * xlmPriceUSD;
     const balanceInIDR = balanceInUSD * usdToIdr;
 
-    const displayedBalance = showInIDR ? balanceInIDR.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) : `$${balanceInUSD.toFixed(2)}`;
+    const displayedBalance = showInIDR
+      ? balanceInIDR.toLocaleString("id-ID", {
+          style: "currency",
+          currency: "IDR",
+        })
+      : `$${balanceInUSD.toFixed(2)}`;
 
     return (
       <div className="wallet-container">
@@ -69,17 +145,32 @@ class Wallet extends Component {
           <p className="company-name">Stellar Wallet</p>
         </header>
 
+        <div className="qr-code-section">
+          <div className="qr-code-container">
+            <QRCodeCanvas
+              value={this.props.publicKey} // Only the public key, no protocol
+              size={qrSize}
+              level="H"
+              includeMargin={true}
+            />
+            <p className="qr-code-label">
+              Scan untuk mendapatkan alamat Stellar
+            </p>
+          </div>
+        </div>
+
         <div className="public-key-section">
-          <strong className='public-key'>Public Key:</strong> <span className="public-key">{this.props.publicKey}</span>
-          <button 
-            className="copy-button" 
+          <strong className="public-key">Public Key:</strong>
+          <span className="public-key">{this.props.publicKey}</span>
+          <button
+            className="copy-button"
             onClick={() => this.copyToClipboard(this.props.publicKey)}
           >
-            {this.state.copySuccess ? '✅' : '📋'}
+            {this.state.copySuccess ? "✅" : "📋"}
           </button>
-          <a 
-            href={stellarchainBaseUrl} 
-            target="_blank" 
+          <a
+            href={stellarchainBaseUrl}
+            target="_blank"
             rel="noopener noreferrer"
             className="stellarchain-link"
             title="Lihat di Stellarchain"
@@ -89,29 +180,74 @@ class Wallet extends Component {
         </div>
 
         <div className="action-buttons">
-          <button 
+          <button
             className="button button-primary"
             onClick={this.props.refreshBalances}
           >
             🔄 Refresh
           </button>
+          <button
+            className="button button-secondary"
+            onClick={this.toggleScanner}
+          >
+            {showScanner ? "❌ Tutup Scanner" : "📷 Scan QR Code"}
+          </button>
         </div>
 
+        {showScanner && (
+          <div className="qr-scanner-container">
+            <QrScanner
+              ref={this.scannerRef}
+              delay={300}
+              onError={this.handleError}
+              onScan={this.handleScan}
+              style={{ width: "100%" }}
+            />
+            <p className="scanner-instruction">
+              Arahkan kamera ke QR Code Stellar
+            </p>
+            {scanError && <p className="scan-error">{scanError}</p>}
+          </div>
+        )}
+
+        {scanResult && (
+          <div className="scan-result-section">
+            <h4>Alamat Stellar yang Di-scan:</h4>
+            <div className="scan-result-text">{scanResult}</div>
+            <div className="scan-result-actions">
+              <button
+                className="button button-primary"
+                onClick={() => this.copyToClipboard(scanResult)}
+              >
+                Salin Alamat
+              </button>
+              <button
+                className="button button-secondary"
+                onClick={() => this.setState({ scanResult: null })}
+              >
+                Bersihkan
+              </button>
+            </div>
+            <p className="scan-hint">
+              Alamat telah dinormalisasi ke format standar Stellar
+            </p>
+          </div>
+        )}
+
+        {/* Rest of your wallet components (balances, etc.) */}
         <div className="balance-card">
           <div className="balance-header">
             <span className="asset-code">XLM</span>
-            <button 
+            <button
               className="currency-toggle-button"
               onClick={this.toggleCurrency}
             >
-              {showInIDR ? 'Switch to USD' : 'Switch to IDR'}
+              {showInIDR ? "Switch to USD" : "Switch to IDR"}
             </button>
           </div>
           <div className="balance-amount">{xlmBalance}</div>
-          <div className="converted-balance">
-            {displayedBalance}
-          </div>
-          <SendButton 
+          <div className="converted-balance">{displayedBalance}</div>
+          <SendButton
             native={true}
             assetCode="XLM"
             server={this.props.server}
@@ -122,14 +258,14 @@ class Wallet extends Component {
         </div>
 
         {this.props.balances
-          .filter(b => b.asset_type !== 'native')
+          .filter((b) => b.asset_type !== "native")
           .map((balance, index) => (
             <div className="balance-card" key={index}>
               <div className="balance-header">
                 <span className="asset-code">{balance.asset_code}</span>
               </div>
               <div className="balance-amount">{balance.balance}</div>
-              <SendButton 
+              <SendButton
                 native={false}
                 assetCode={balance.asset_code}
                 issuer={balance.asset_issuer}
@@ -139,8 +275,7 @@ class Wallet extends Component {
                 refreshBalances={this.props.refreshBalances}
               />
             </div>
-          ))
-        }
+          ))}
 
         <div className="wallet-footer">
           <div className="wallet-icon">💰</div>

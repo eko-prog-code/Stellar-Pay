@@ -6,8 +6,10 @@
     "@stellar/design-system": "^3.0.0",
     "babel-runtime": "^5.0.0",
     "material-ui": "^0.20.0",
+    "qrcode.react": "^4.2.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-qr-scanner": "^1.0.0-alpha.11",
     "react-scripts": "1.0.17",
     "stellar-sdk": "^13.1.0"
   },
