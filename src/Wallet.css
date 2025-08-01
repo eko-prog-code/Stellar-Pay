@@ -587,3 +587,19 @@
   text-align: center;
   margin-top: 10px;
 }
+
+/* Tambahkan ini ke Wallet.css Anda */
+.scan-result-section h4 {
+  color: #000000; /* Warna hitam */
+  margin-bottom: 10px;
+}
+
+.scan-result-text {
+  color: #000000; /* Warna hitam */
+  background: white;
+  padding: 10px;
+  border-radius: 4px;
+  word-break: break-all;
+  font-family: monospace;
+  margin: 10px 0;
+}
