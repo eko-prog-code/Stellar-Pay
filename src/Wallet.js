@@ -16,6 +16,7 @@ class Wallet extends Component {
       showScanner: false,
       qrSize: 200,
       scanError: null,
+      facingMode: "environment", // Default to back camera
     };
     this.scannerRef = React.createRef();
   }
@@ -73,10 +74,8 @@ class Wallet extends Component {
   handleScan = (data) => {
     if (data) {
       try {
-        // Clean and normalize the scanned data
         const scannedText = data.text.trim().toUpperCase();
 
-        // Validate Stellar public key format
         if (/^G[A-Z0-9]{55}$/.test(scannedText)) {
           this.setState({
             scanResult: scannedText,
@@ -89,7 +88,7 @@ class Wallet extends Component {
       } catch (error) {
         this.setState({
           scanError:
-            "QR code tidak valid. Pastikan Anda memindai alamat Stellar (mulai dengan G, 56 karakter)",
+            "Invalid QR code. Please scan a valid Stellar address (starts with G, 56 characters)",
           scanResult: null,
         });
       }
@@ -100,7 +99,7 @@ class Wallet extends Component {
     console.error(err);
     this.setState({
       scanError:
-        "Gagal memindai QR code. Pastikan kamera dapat mengakses QR code.",
+        "Failed to scan QR code. Please ensure camera access is granted.",
     });
   };
 
@@ -109,6 +108,13 @@ class Wallet extends Component {
       showScanner: !prevState.showScanner,
       scanError: null,
       scanResult: null,
+      facingMode: "environment", // Always default to back camera when opening
+    }));
+  };
+
+  toggleCamera = () => {
+    this.setState((prevState) => ({
+      facingMode: prevState.facingMode === "user" ? "environment" : "user",
     }));
   };
 
@@ -126,6 +132,7 @@ class Wallet extends Component {
       showScanner,
       qrSize,
       scanError,
+      facingMode,
     } = this.state;
 
     const balanceInUSD = xlmBalance * xlmPriceUSD;
@@ -148,14 +155,12 @@ class Wallet extends Component {
         <div className="qr-code-section">
           <div className="qr-code-container">
             <QRCodeCanvas
-              value={this.props.publicKey} // Only the public key, no protocol
+              value={this.props.publicKey}
               size={qrSize}
               level="H"
               includeMargin={true}
             />
-            <p className="qr-code-label">
-              Scan untuk mendapatkan alamat Stellar
-            </p>
+            <p className="qr-code-label">Scan to receive Stellar address</p>
           </div>
         </div>
 
@@ -173,7 +178,7 @@ class Wallet extends Component {
             target="_blank"
             rel="noopener noreferrer"
             className="stellarchain-link"
-            title="Lihat di Stellarchain"
+            title="View on Stellarchain"
           >
             🔗
           </a>
@@ -190,7 +195,7 @@ class Wallet extends Component {
             className="button button-secondary"
             onClick={this.toggleScanner}
           >
-            {showScanner ? "❌ Tutup Scanner" : "📷 Scan QR Code"}
+            {showScanner ? "❌ Close Scanner" : "📷 Scan QR Code"}
           </button>
         </div>
 
@@ -202,9 +207,24 @@ class Wallet extends Component {
               onError={this.handleError}
               onScan={this.handleScan}
               style={{ width: "100%" }}
+              facingMode={facingMode}
+              constraints={{
+                facingMode: facingMode,
+                aspectRatio: 1, // Helps with square QR code scanning
+              }}
             />
+            <div className="scanner-controls">
+              <button
+                className="button button-camera"
+                onClick={this.toggleCamera}
+              >
+                {facingMode === "environment"
+                  ? "📱 Front Camera"
+                  : "📷 Back Camera"}
+              </button>
+            </div>
             <p className="scanner-instruction">
-              Arahkan kamera ke QR Code Stellar
+              Point camera at Stellar QR Code
             </p>
             {scanError && <p className="scan-error">{scanError}</p>}
           </div>
@@ -212,29 +232,29 @@ class Wallet extends Component {
 
         {scanResult && (
           <div className="scan-result-section">
-            <h4>Alamat Stellar yang Di-scan:</h4>
+            <h4>Scanned Stellar Address:</h4>
             <div className="scan-result-text">{scanResult}</div>
             <div className="scan-result-actions">
               <button
                 className="button button-primary"
                 onClick={() => this.copyToClipboard(scanResult)}
               >
-                Salin Alamat
+                Copy Address
               </button>
               <button
                 className="button button-secondary"
                 onClick={() => this.setState({ scanResult: null })}
               >
-                Bersihkan
+                Clear
               </button>
             </div>
             <p className="scan-hint">
-              Alamat telah dinormalisasi ke format standar Stellar
+              Address has been normalized to standard Stellar format
             </p>
           </div>
         )}
 
-        {/* Rest of your wallet components (balances, etc.) */}
+        {/* Rest of your wallet components */}
         <div className="balance-card">
           <div className="balance-header">
             <span className="asset-code">XLM</span>
