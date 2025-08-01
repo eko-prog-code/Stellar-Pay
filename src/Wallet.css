@@ -421,3 +421,48 @@
     font-size: 20px;
   }
 }
+
+/* Scanner Controls */
+.scanner-controls {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.button-camera {
+  background-color: #4a5568;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button-camera:hover {
+  background-color: #2d3748;
+}
+
+/* Responsive adjustments for scanner */
+@media (max-width: 480px) {
+  .qr-scanner-container {
+    margin: 10px 0;
+    padding: 10px;
+  }
+
+  .scanner-instruction {
+    font-size: 14px;
+  }
+
+  .button-camera {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Make sure scanner maintains aspect ratio */
+.qr-scanner-container video {
+  object-fit: cover;
+  border-radius: 8px;
+}
