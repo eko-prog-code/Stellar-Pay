@@ -13,6 +13,7 @@ class Start extends Component {
     };
     this.taglines = [
       "🚀 Bikin rekening dalam 1 detik \"Stellar Wallet\"",
+      "🚀{user to blockchain to user} \"tanpa kendali institusi\" \"atau pemerintah\"",
       "🚀 Transaksi Global \"gunakan XLM Stellar\"",
       "🚀 Payment dan Aset Digital \"XLM Stellar\"",
       "🚀 Belajar menabung cerdas \"XLM Stellar\"",
