@@ -154,6 +154,7 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       right: 0,
       top: 0,
       padding: '5px',
+      marginBottom: '30px',
     },
     closeButtonHover: {
       transform: 'scale(1.1) rotate(90deg)',
@@ -229,13 +230,12 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       color: '#666',
       marginBottom: '8px',
       fontWeight: '500',
-      marginTop: '30px',
     },
     pasteButton: {
       position: 'absolute',
       right: '12px',
       top: '50%',
-      transform: 'translateY(calc(-50% - 12px))',
+      transform: 'translateY(calc(-50% - 30px))',
       background: 'none',
       border: 'none',
       cursor: 'pointer',
