@@ -87,19 +87,20 @@ class Start extends Component {
         </div>
 
         <div className="mt-8 w-full max-w-md bg-gray-800 p-6 rounded-xl shadow-lg">
-          <label className="block text-sm font-medium mb-2">Private Key</label>
-          <div className="relative">
+          <div className="input-container">
+            <label className="block text-sm font-medium mb-2">Private Key</label>
             <input
               type="text"
               placeholder="Enter your private key..."
               value={this.state.privateKey}
               onChange={(e) => this.onChange(e)}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+              className="private-key-input"
             />
             <button 
               onClick={this.handlePaste}
-              className="absolute inset-y-0 right-0 flex items-center pr-3 text-white hover:text-blue-400 transition-colors"
+              className="paste-emoji"
               type="button"
+              aria-label="Paste private key"
             >
               📋
             </button>
