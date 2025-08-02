@@ -96,7 +96,7 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
     }
   };
 
-  // Styles with modern teen-friendly design
+  // Styles with improved text visibility
   const styles = {
     container: {
       display: 'inline-block',
@@ -176,11 +176,13 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       transition: 'all 0.3s ease',
       boxSizing: 'border-box',
       backgroundColor: '#f8f9fa',
+      color: '#333', // Warna teks yang kontras
     },
     inputFocus: {
       borderColor: '#0096FF',
       boxShadow: '0 0 0 3px rgba(0, 150, 255, 0.2)',
       backgroundColor: '#fff',
+      color: '#000', // Warna teks lebih gelap saat focus
     },
     button: {
       backgroundColor: '#0096FF',
@@ -331,11 +333,13 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
                 e.target.style.borderColor = styles.inputFocus.borderColor;
                 e.target.style.boxShadow = styles.inputFocus.boxShadow;
                 e.target.style.backgroundColor = styles.inputFocus.backgroundColor;
+                e.target.style.color = styles.inputFocus.color;
               }}
               onBlur={(e) => {
                 e.target.style.borderColor = styles.input.borderColor;
                 e.target.style.boxShadow = 'none';
                 e.target.style.backgroundColor = styles.input.backgroundColor;
+                e.target.style.color = styles.input.color;
               }}
             />
             <button
@@ -374,11 +378,13 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
                 e.target.style.borderColor = styles.inputFocus.borderColor;
                 e.target.style.boxShadow = styles.inputFocus.boxShadow;
                 e.target.style.backgroundColor = styles.inputFocus.backgroundColor;
+                e.target.style.color = styles.inputFocus.color;
               }}
               onBlur={(e) => {
                 e.target.style.borderColor = styles.input.borderColor;
                 e.target.style.boxShadow = 'none';
                 e.target.style.backgroundColor = styles.input.backgroundColor;
+                e.target.style.color = styles.input.color;
               }}
             />
           </div>
@@ -396,11 +402,13 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
                 e.target.style.borderColor = styles.inputFocus.borderColor;
                 e.target.style.boxShadow = styles.inputFocus.boxShadow;
                 e.target.style.backgroundColor = styles.inputFocus.backgroundColor;
+                e.target.style.color = styles.inputFocus.color;
               }}
               onBlur={(e) => {
                 e.target.style.borderColor = styles.input.borderColor;
                 e.target.style.boxShadow = 'none';
                 e.target.style.backgroundColor = styles.input.backgroundColor;
+                e.target.style.color = styles.input.color;
               }}
             />
           </div>
