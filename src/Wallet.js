@@ -19,6 +19,7 @@ class Wallet extends Component {
       facingMode: { exact: "environment" }, // Default ke kamera belakang
       hasBackCamera: true,
       cameraPermissionGranted: false,
+      addressCopied: false, // New state for tracking address copy
     };
     this.scannerRef = React.createRef();
   }
@@ -98,8 +99,8 @@ class Wallet extends Component {
 
   copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
-      this.setState({ copySuccess: true });
-      setTimeout(() => this.setState({ copySuccess: false }), 2000);
+      this.setState({ copySuccess: true, addressCopied: true });
+      setTimeout(() => this.setState({ copySuccess: false, addressCopied: false }), 2000);
     });
   };
 
@@ -192,6 +193,7 @@ class Wallet extends Component {
       scanError,
       facingMode,
       hasBackCamera,
+      addressCopied,
     } = this.state;
 
     const balanceInUSD = xlmBalance * xlmPriceUSD;
@@ -296,6 +298,11 @@ class Wallet extends Component {
           <div className="scan-result-section">
             <h4>Alamat Stellar yang Di-scan:</h4>
             <div className="scan-result-text">{scanResult}</div>
+            {addressCopied && (
+              <div className="copy-success-message">
+                Alamat berhasil di salin!
+              </div>
+            )}
             <div className="scan-result-actions">
               <button
                 className="button button-primary"
