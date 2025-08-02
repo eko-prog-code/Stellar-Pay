@@ -162,6 +162,5 @@ button + button {
     right: 8px;
     font-size: 1rem;
     bottom: 12px; /* Naik 12px dari bawah */
-    position: relative; /* atau absolute/fixed tergantung kebutuhan */
 }
 }
