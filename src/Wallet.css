@@ -603,3 +603,20 @@
   font-family: monospace;
   margin: 10px 0;
 }
+
+.copy-success-message {
+  text-align: center;
+  margin: 10px 0;
+  padding: 8px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 4px;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
