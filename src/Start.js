@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import GenerateWalletButton from "./GenerateWalletButton.js";
 import "./Start.css";
 import rocketImage from "./images/rocket.png";
+import { FiCopy } from "react-icons/fi";
 
 class Start extends Component {
   constructor(props) {
@@ -55,6 +56,22 @@ class Start extends Component {
     this.setState({ privateKey: event.target.value });
   }
 
+  handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      this.setState({ privateKey: text });
+    } catch (err) {
+      console.error('Failed to read clipboard contents: ', err);
+      // Fallback for browsers that don't support clipboard API
+      const dummy = document.createElement('input');
+      document.body.appendChild(dummy);
+      dummy.focus();
+      document.execCommand('paste');
+      this.setState({ privateKey: dummy.value });
+      document.body.removeChild(dummy);
+    }
+  };
+
   render() {
     return (
       <div className="container min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white px-4">     
@@ -71,20 +88,29 @@ class Start extends Component {
         </div>
 
         <div className="mt-8 w-full max-w-md bg-gray-800 p-6 rounded-xl shadow-lg">
-          <label className="block text-sm font-medium mb-2">Private Key</label>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium">Private Key</label>
+            <button 
+              onClick={this.handlePaste}
+              className="flex items-center text-sm text-white hover:text-blue-400 transition-colors"
+            >
+              <FiCopy className="mr-1" />
+              Paste Private Key
+            </button>
+          </div>
           <input
             type="text"
             placeholder="Enter your private key..."
             value={this.state.privateKey}
             onChange={(e) => this.onChange(e)}
-            className="private-key-input"
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
 
           <div className="mt-6 flex flex-col space-y-5">
-            <button className="w-full bg-blue-500 hover:bg-blue-400 px-4 py-2 rounded-md" onClick={() => this.onSubmit(false)}>
+            <button className="w-full bg-blue-500 hover:bg-blue-400 px-4 py-2 rounded-md transition-colors" onClick={() => this.onSubmit(false)}>
               Open Wallet
             </button>
-            <button className="w-full bg-green-500 hover:bg-green-400 px-4 py-2 rounded-md" onClick={() => this.onSubmit(true)}>
+            <button className="w-full bg-green-500 hover:bg-green-400 px-4 py-2 rounded-md transition-colors" onClick={() => this.onSubmit(true)}>
               Open TestNet Wallet
             </button>
           </div>
