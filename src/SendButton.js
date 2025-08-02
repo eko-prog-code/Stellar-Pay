@@ -130,6 +130,7 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: '20px',
+      position: 'relative',
     },
     title: {
       margin: 0,
@@ -139,6 +140,8 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       background: 'linear-gradient(90deg, #0096FF, #00D4FF)',
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
+      textAlign: 'center',
+      flex: 1,
     },
     closeButton: {
       background: 'none',
@@ -147,10 +150,10 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       cursor: 'pointer',
       color: '#ff4757',
       transition: 'all 0.3s ease',
-      transform: 'scale(1)',
-      filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))',
-      marginLeft: 'auto',
-      marginRight: '10px',
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      padding: '5px',
     },
     closeButtonHover: {
       transform: 'scale(1.1) rotate(90deg)',
@@ -169,7 +172,7 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
     },
     input: {
       width: '100%',
-      padding: '12px 50px 12px 15px',
+      padding: '12px 45px 12px 15px',
       borderRadius: '10px',
       border: '2px solid #e0e0e0',
       fontSize: '1rem',
@@ -229,14 +232,14 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
     },
     pasteButton: {
       position: 'absolute',
-      right: '15px',
+      right: '12px',
       top: '50%',
       transform: 'translateY(-50%)',
       background: 'none',
       border: 'none',
       cursor: 'pointer',
       color: '#666',
-      fontSize: '1.5rem',
+      fontSize: '1.2rem',
       transition: 'all 0.3s ease',
       padding: '5px',
       borderRadius: '50%',
@@ -247,6 +250,26 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       transform: 'translateY(-50%) scale(1.1)',
       backgroundColor: 'rgba(0, 150, 255, 0.1)',
     },
+    mobileStyles: {
+      modalContent: {
+        padding: '20px',
+        borderRadius: '12px',
+      },
+      title: {
+        fontSize: '1.5rem',
+        paddingRight: '30px',
+      },
+      closeButton: {
+        fontSize: '1.5rem',
+      },
+      input: {
+        padding: '10px 40px 10px 12px',
+      },
+      pasteButton: {
+        right: '10px',
+        fontSize: '1rem',
+      }
+    }
   };
 
   const animations = `
@@ -271,35 +294,66 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
+    
+    @media (max-width: 600px) {
+      .modal-content {
+        padding: 20px;
+        border-radius: 12px;
+      }
+      .modal-title {
+        font-size: 1.5rem;
+        padding-right: 30px;
+      }
+      .close-button {
+        font-size: 1.5rem;
+      }
+      .input-field {
+        padding: 10px 40px 10px 12px;
+      }
+      .paste-button {
+        right: 10px;
+        font-size: 1rem;
+      }
+    }
   `;
 
+  const isMobile = window.innerWidth <= 600;
+  const currentStyles = isMobile ? {
+    ...styles,
+    modalContent: { ...styles.modalContent, ...styles.mobileStyles.modalContent },
+    title: { ...styles.title, ...styles.mobileStyles.title },
+    closeButton: { ...styles.closeButton, ...styles.mobileStyles.closeButton },
+    input: { ...styles.input, ...styles.mobileStyles.input },
+    pasteButton: { ...styles.pasteButton, ...styles.mobileStyles.pasteButton }
+  } : styles;
+
   return (
-    <div style={styles.container}>
+    <div style={currentStyles.container}>
       <style>{animations}</style>
       
       <button 
         onClick={() => setIsOpen(true)}
-        style={styles.button}
-        onMouseEnter={(e) => e.target.style.backgroundColor = styles.buttonHover.backgroundColor}
-        onMouseLeave={(e) => e.target.style.backgroundColor = styles.button.backgroundColor}
+        style={currentStyles.button}
+        onMouseEnter={(e) => e.target.style.backgroundColor = currentStyles.buttonHover.backgroundColor}
+        onMouseLeave={(e) => e.target.style.backgroundColor = currentStyles.button.backgroundColor}
       >
         Send XLM 🚀
       </button>
 
-      <div style={styles.modalOverlay}>
-        <div style={styles.modalContent}>
-          <div style={styles.header}>
-            <h2 style={styles.title}>Send XLM 💫</h2>
+      <div style={currentStyles.modalOverlay}>
+        <div style={currentStyles.modalContent}>
+          <div style={currentStyles.header}>
+            <h2 style={currentStyles.title}>Send XLM 💫</h2>
             <button 
               onClick={handleClose}
-              style={styles.closeButton}
+              style={currentStyles.closeButton}
               onMouseEnter={(e) => {
-                e.target.style.transform = styles.closeButtonHover.transform;
-                e.target.style.color = styles.closeButtonHover.color;
+                e.target.style.transform = currentStyles.closeButtonHover.transform;
+                e.target.style.color = currentStyles.closeButtonHover.color;
               }}
               onMouseLeave={(e) => {
-                e.target.style.transform = styles.closeButton.transform;
-                e.target.style.color = styles.closeButton.color;
+                e.target.style.transform = 'none';
+                e.target.style.color = currentStyles.closeButton.color;
               }}
               aria-label="Close"
             >
@@ -307,21 +361,21 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
             </button>
           </div>
 
-          <div style={styles.inputGroup}>
-            <p style={styles.balanceInfo}>💰 Current Balance: {balance} XLM</p>
-            <p style={styles.balanceInfo}>⏳ Transaction fee: 0.00001 XLM</p>
+          <div style={currentStyles.inputGroup}>
+            <p style={currentStyles.balanceInfo}>💰 Current Balance: {balance} XLM</p>
+            <p style={currentStyles.balanceInfo}>⏳ Transaction fee: 0.00001 XLM</p>
           </div>
 
           {status.error && (
-            <div style={styles.error}>❌ {status.error}</div>
+            <div style={currentStyles.error}>❌ {status.error}</div>
           )}
           
           {status.success && (
-            <div style={styles.success}>✅ {status.success}</div>
+            <div style={currentStyles.success}>✅ {status.success}</div>
           )}
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>📍 Destination Address</label>
+          <div style={currentStyles.inputGroup}>
+            <label style={currentStyles.label}>📍 Destination Address</label>
             <div style={{ position: 'relative' }}>
               <input
                 type="text"
@@ -329,31 +383,31 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
                 value={formData.destination}
                 onChange={handleInputChange}
                 placeholder="GXXXXX..."
-                style={styles.input}
+                style={currentStyles.input}
                 onFocus={(e) => {
-                  e.target.style.borderColor = styles.inputFocus.borderColor;
-                  e.target.style.boxShadow = styles.inputFocus.boxShadow;
-                  e.target.style.backgroundColor = styles.inputFocus.backgroundColor;
-                  e.target.style.color = styles.inputFocus.color;
+                  e.target.style.borderColor = currentStyles.inputFocus.borderColor;
+                  e.target.style.boxShadow = currentStyles.inputFocus.boxShadow;
+                  e.target.style.backgroundColor = currentStyles.inputFocus.backgroundColor;
+                  e.target.style.color = currentStyles.inputFocus.color;
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = styles.input.borderColor;
+                  e.target.style.borderColor = currentStyles.input.borderColor;
                   e.target.style.boxShadow = 'none';
-                  e.target.style.backgroundColor = styles.input.backgroundColor;
-                  e.target.style.color = styles.input.color;
+                  e.target.style.backgroundColor = currentStyles.input.backgroundColor;
+                  e.target.style.color = currentStyles.input.color;
                 }}
               />
               <button
                 onClick={handlePaste}
                 className="paste-button"
-                style={styles.pasteButton}
+                style={currentStyles.pasteButton}
                 onMouseEnter={(e) => {
-                  e.target.style.color = styles.pasteButtonHover.color;
-                  e.target.style.transform = styles.pasteButtonHover.transform;
-                  e.target.style.backgroundColor = styles.pasteButtonHover.backgroundColor;
+                  e.target.style.color = currentStyles.pasteButtonHover.color;
+                  e.target.style.transform = currentStyles.pasteButtonHover.transform;
+                  e.target.style.backgroundColor = currentStyles.pasteButtonHover.backgroundColor;
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.color = styles.pasteButton.color;
+                  e.target.style.color = currentStyles.pasteButton.color;
                   e.target.style.transform = 'translateY(-50%)';
                   e.target.style.backgroundColor = 'transparent';
                 }}
@@ -365,8 +419,8 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
             </div>
           </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>💵 Amount (XLM)</label>
+          <div style={currentStyles.inputGroup}>
+            <label style={currentStyles.label}>💵 Amount (XLM)</label>
             <input
               type="number"
               name="amount"
@@ -375,42 +429,42 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
               placeholder="0.0"
               step="0.0000001"
               min="0"
-              style={styles.input}
+              style={currentStyles.input}
               onFocus={(e) => {
-                e.target.style.borderColor = styles.inputFocus.borderColor;
-                e.target.style.boxShadow = styles.inputFocus.boxShadow;
-                e.target.style.backgroundColor = styles.inputFocus.backgroundColor;
-                e.target.style.color = styles.inputFocus.color;
+                e.target.style.borderColor = currentStyles.inputFocus.borderColor;
+                e.target.style.boxShadow = currentStyles.inputFocus.boxShadow;
+                e.target.style.backgroundColor = currentStyles.inputFocus.backgroundColor;
+                e.target.style.color = currentStyles.inputFocus.color;
               }}
               onBlur={(e) => {
-                e.target.style.borderColor = styles.input.borderColor;
+                e.target.style.borderColor = currentStyles.input.borderColor;
                 e.target.style.boxShadow = 'none';
-                e.target.style.backgroundColor = styles.input.backgroundColor;
-                e.target.style.color = styles.input.color;
+                e.target.style.backgroundColor = currentStyles.input.backgroundColor;
+                e.target.style.color = currentStyles.input.color;
               }}
             />
           </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>📝 Memo (Optional)</label>
+          <div style={currentStyles.inputGroup}>
+            <label style={currentStyles.label}>📝 Memo (Optional)</label>
             <input
               type="text"
               name="memo"
               value={formData.memo}
               onChange={handleInputChange}
               placeholder="Add a message..."
-              style={styles.input}
+              style={currentStyles.input}
               onFocus={(e) => {
-                e.target.style.borderColor = styles.inputFocus.borderColor;
-                e.target.style.boxShadow = styles.inputFocus.boxShadow;
-                e.target.style.backgroundColor = styles.inputFocus.backgroundColor;
-                e.target.style.color = styles.inputFocus.color;
+                e.target.style.borderColor = currentStyles.inputFocus.borderColor;
+                e.target.style.boxShadow = currentStyles.inputFocus.boxShadow;
+                e.target.style.backgroundColor = currentStyles.inputFocus.backgroundColor;
+                e.target.style.color = currentStyles.inputFocus.color;
               }}
               onBlur={(e) => {
-                e.target.style.borderColor = styles.input.borderColor;
+                e.target.style.borderColor = currentStyles.input.borderColor;
                 e.target.style.boxShadow = 'none';
-                e.target.style.backgroundColor = styles.input.backgroundColor;
-                e.target.style.color = styles.input.color;
+                e.target.style.backgroundColor = currentStyles.input.backgroundColor;
+                e.target.style.color = currentStyles.input.color;
               }}
             />
           </div>
@@ -419,20 +473,20 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
             onClick={handleSubmit}
             disabled={status.loading}
             style={{
-              ...styles.button,
+              ...currentStyles.button,
               animation: status.loading ? 'pulse 1.5s infinite' : 'none'
             }}
             onMouseEnter={(e) => {
               if (!status.loading) {
-                e.target.style.backgroundColor = styles.buttonHover.backgroundColor;
-                e.target.style.transform = styles.buttonHover.transform;
-                e.target.style.boxShadow = styles.buttonHover.boxShadow;
+                e.target.style.backgroundColor = currentStyles.buttonHover.backgroundColor;
+                e.target.style.transform = currentStyles.buttonHover.transform;
+                e.target.style.boxShadow = currentStyles.buttonHover.boxShadow;
               }
             }}
             onMouseLeave={(e) => {
-              e.target.style.backgroundColor = styles.button.backgroundColor;
+              e.target.style.backgroundColor = currentStyles.button.backgroundColor;
               e.target.style.transform = 'none';
-              e.target.style.boxShadow = styles.button.boxShadow;
+              e.target.style.boxShadow = currentStyles.button.boxShadow;
             }}
           >
             {status.loading ? (
