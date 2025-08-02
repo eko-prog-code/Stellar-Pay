@@ -158,8 +158,10 @@ button + button {
     padding: 10px 36px 10px 10px;
   }
 
-  .paste-emoji {
+.paste-emoji {
     right: 8px;
     font-size: 1rem;
-  }
+    bottom: 12px; /* Naik 12px dari bawah */
+    position: relative; /* atau absolute/fixed tergantung kebutuhan */
+}
 }
