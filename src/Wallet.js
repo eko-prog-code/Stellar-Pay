@@ -17,13 +17,15 @@ class Wallet extends Component {
       hasBackCamera: true,
       cameraPermissionGranted: false,
       addressCopied: false,
+      retryCount: 0,
+      maxRetries: 3,
+      isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent),
+      cameraReady: false
     };
     this.scannerRef = React.createRef();
   }
 
   componentDidMount() {
-    const styleSheet = document.createElement("style");
-    document.head.appendChild(styleSheet);
     this.updateQrSize();
     window.addEventListener("resize", this.updateQrSize);
     this.checkCameraSupport();
@@ -31,36 +33,75 @@ class Wallet extends Component {
 
   componentWillUnmount() {
     window.removeEventListener("resize", this.updateQrSize);
+    this.stopCameraStream();
   }
+
+  stopCameraStream = () => {
+    if (this.scannerRef.current && this.scannerRef.current.stream) {
+      this.scannerRef.current.stream.getTracks().forEach(track => track.stop());
+    }
+  };
 
   checkCameraSupport = async () => {
     try {
-      // Check camera permission first
-      await navigator.mediaDevices.getUserMedia({ video: true });
+      // First try basic camera access
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      });
+      this.stopCameraStream();
+      
       this.setState({ cameraPermissionGranted: true });
 
-      // Enumerate devices to check for back camera
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter(
-        (device) => device.kind === "videoinput"
-      );
+      // Then specifically check for back camera
+      try {
+        const backStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { exact: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+        this.stopCameraStream();
+        
+        this.setState({ 
+          hasBackCamera: true,
+          facingMode: { exact: "environment" },
+          cameraReady: true
+        });
+      } catch (backError) {
+        console.log("Back camera not available, using front");
+        this.setState({ 
+          hasBackCamera: false,
+          facingMode: "user",
+          cameraReady: true
+        });
+      }
 
-      const hasBackCamera = videoDevices.some((device) => {
+      // Additional check through device enumeration
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(device => device.kind === "videoinput");
+      
+      const hasPhysicalBackCamera = videoDevices.some(device => {
         return (
           device.label.toLowerCase().includes("back") ||
           device.label.toLowerCase().includes("rear")
         );
       });
 
-      this.setState({
-        hasBackCamera,
-        facingMode: hasBackCamera ? { exact: "environment" } : "user",
-      });
+      if (hasPhysicalBackCamera && !this.state.hasBackCamera) {
+        this.setState({ hasBackCamera: true });
+      }
     } catch (error) {
       console.error("Camera check error:", error);
       this.setState({
         scanError: "Cannot access camera. Please ensure camera permission is granted.",
         cameraPermissionGranted: false,
+        hasBackCamera: false,
+        facingMode: "user",
+        cameraReady: true
       });
     }
   };
@@ -82,13 +123,13 @@ class Wallet extends Component {
     if (data) {
       try {
         const scannedText = data.text.trim().toUpperCase();
-
         if (/^G[A-Z0-9]{55}$/.test(scannedText)) {
           this.setState({
             scanResult: scannedText,
             scanError: null,
             showScanner: false,
           });
+          this.stopCameraStream();
         } else {
           throw new Error("Invalid Stellar address format");
         }
@@ -103,17 +144,35 @@ class Wallet extends Component {
 
   handleError = (err) => {
     console.error("Camera Error:", err);
-
-    if (err.name === "OverconstrainedError" && err.constraint === "facingMode") {
-      // If back camera not available, switch to front camera
+    
+    if (err.name === "OverconstrainedError") {
+      if (this.state.retryCount < this.state.maxRetries) {
+        this.setState(prevState => ({
+          retryCount: prevState.retryCount + 1,
+          scanError: `Adjusting camera (attempt ${prevState.retryCount + 1}/${this.state.maxRetries})`
+        }));
+        
+        setTimeout(() => {
+          this.setState({
+            facingMode: this.state.hasBackCamera ? { exact: "environment" } : "user"
+          });
+        }, 500);
+      } else {
+        this.setState({
+          facingMode: "user",
+          hasBackCamera: false,
+          scanError: "Using front camera",
+          retryCount: 0
+        });
+      }
+    } else if (err.name === "NotAllowedError") {
       this.setState({
-        facingMode: "user",
-        hasBackCamera: false,
-        scanError: "Back camera not available, switching to front camera",
+        scanError: "Camera permission denied. Please enable camera access in settings.",
+        cameraPermissionGranted: false
       });
     } else {
       this.setState({
-        scanError: "Failed to access camera. Please ensure camera permission is granted.",
+        scanError: "Camera error. Please try again.",
       });
     }
   };
@@ -121,32 +180,70 @@ class Wallet extends Component {
   toggleScanner = () => {
     if (!this.state.cameraPermissionGranted) {
       this.setState({
-        scanError: "Camera permission required for QR code scanning",
+        scanError: "Camera permission required for QR scanning",
       });
       return;
     }
 
-    this.setState((prevState) => ({
-      showScanner: !prevState.showScanner,
-      scanError: null,
-      scanResult: null,
-      facingMode: this.state.hasBackCamera ? { exact: "environment" } : "user",
-    }));
+    this.setState(prevState => {
+      if (prevState.showScanner) {
+        this.stopCameraStream();
+        return {
+          showScanner: false,
+          scanError: null,
+          scanResult: null,
+          retryCount: 0
+        };
+      } else {
+        return {
+          showScanner: true,
+          scanError: null,
+          scanResult: null,
+          facingMode: this.state.hasBackCamera ? { exact: "environment" } : "user",
+          retryCount: 0
+        };
+      }
+    });
   };
 
   toggleCamera = () => {
-    this.setState((prevState) => ({
-      facingMode:
-        prevState.facingMode.exact === "environment"
-          ? "user"
-          : { exact: "environment" },
-    }));
+    this.setState(prevState => {
+      const newFacingMode = 
+        prevState.facingMode.exact === "environment" 
+          ? "user" 
+          : { exact: "environment" };
+      
+      return {
+        facingMode: newFacingMode,
+        retryCount: 0,
+        scanError: null
+      };
+    });
+  };
+
+  getCameraConstraints = () => {
+    if (this.state.isIOS) {
+      return {
+        video: {
+          facingMode: this.state.facingMode,
+          width: { ideal: 800 },
+          height: { ideal: 600 }
+        }
+      };
+    }
+    
+    return {
+      video: {
+        facingMode: this.state.facingMode,
+        aspectRatio: 1,
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+    };
   };
 
   render() {
-    const mainBalance = this.props.balances.find(
-      (b) => b.asset_type === "native"
-    );
+    const mainBalance = this.props.balances.find(b => b.asset_type === "native");
     const xlmBalance = mainBalance ? mainBalance.balance : "0";
     const stellarchainBaseUrl = `https://stellarchain.io/accounts/${this.props.publicKey}`;
     const {
@@ -157,6 +254,9 @@ class Wallet extends Component {
       facingMode,
       hasBackCamera,
       addressCopied,
+      retryCount,
+      maxRetries,
+      cameraReady
     } = this.state;
 
     return (
@@ -208,6 +308,7 @@ class Wallet extends Component {
           <button
             className="button button-secondary"
             onClick={this.toggleScanner}
+            disabled={!cameraReady}
           >
             {showScanner ? "❌ Close Scanner" : "📷 Scan QR Code"}
           </button>
@@ -215,24 +316,23 @@ class Wallet extends Component {
 
         {showScanner && (
           <div className="qr-scanner-container">
-            <QrScanner
-              ref={this.scannerRef}
-              delay={300}
-              onError={this.handleError}
-              onScan={this.handleScan}
-              style={{ width: "100%" }}
-              constraints={{
-                video: {
-                  facingMode: facingMode,
-                  aspectRatio: 1,
-                },
-              }}
-            />
+            {cameraReady && (
+              <QrScanner
+                ref={this.scannerRef}
+                delay={300}
+                onError={this.handleError}
+                onScan={this.handleScan}
+                style={{ width: "100%" }}
+                constraints={this.getCameraConstraints()}
+              />
+            )}
+            
             <div className="scanner-controls">
               {hasBackCamera && (
                 <button
                   className="button button-camera"
                   onClick={this.toggleCamera}
+                  disabled={retryCount > 0}
                 >
                   {facingMode.exact === "environment"
                     ? "📱 Front Camera"
@@ -240,10 +340,19 @@ class Wallet extends Component {
                 </button>
               )}
             </div>
+            
             <p className="scanner-instruction">
               Point camera at Stellar QR Code
             </p>
-            {scanError && <p className="scan-error">{scanError}</p>}
+            
+            {scanError && (
+              <p className="scan-error">
+                {scanError}
+                {retryCount > 0 && (
+                  <span> (Retrying {retryCount}/{maxRetries})</span>
+                )}
+              </p>
+            )}
           </div>
         )}
 
