@@ -229,6 +229,7 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       color: '#666',
       marginBottom: '8px',
       fontWeight: '500',
+      marginTop: '20px',
     },
     pasteButton: {
       position: 'absolute',
@@ -239,7 +240,9 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       border: 'none',
       cursor: 'pointer',
       color: '#666',
-      fontSize: '1.2rem',
+      fontSize: '1.5rem', // Diperbesar dari 1.2rem
+      width: '32px', // Lebar tetap
+      height: '32px', // Tinggi tetap
       transition: 'all 0.3s ease',
       padding: '5px',
       borderRadius: '50%',
