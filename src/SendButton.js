@@ -29,7 +29,6 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
         destination: text,
       });
       
-      // Animasi paste berhasil
       const pasteBtn = document.querySelector('.paste-button');
       pasteBtn.innerHTML = '✓';
       setTimeout(() => {
@@ -96,7 +95,6 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
     }
   };
 
-  // Styles with improved text visibility
   const styles = {
     container: {
       display: 'inline-block',
@@ -151,6 +149,8 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       transition: 'all 0.3s ease',
       transform: 'scale(1)',
       filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))',
+      marginLeft: 'auto',
+      marginRight: '10px',
     },
     closeButtonHover: {
       transform: 'scale(1.1) rotate(90deg)',
@@ -176,13 +176,13 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       transition: 'all 0.3s ease',
       boxSizing: 'border-box',
       backgroundColor: '#f8f9fa',
-      color: '#333', // Warna teks yang kontras
+      color: '#333',
     },
     inputFocus: {
       borderColor: '#0096FF',
       boxShadow: '0 0 0 3px rgba(0, 150, 255, 0.2)',
       backgroundColor: '#fff',
-      color: '#000', // Warna teks lebih gelap saat focus
+      color: '#000',
     },
     button: {
       backgroundColor: '#0096FF',
@@ -229,26 +229,26 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
     },
     pasteButton: {
       position: 'absolute',
-      right: '12px',
-      top: '38px',
+      right: '15px',
+      top: '50%',
+      transform: 'translateY(-50%)',
       background: 'none',
       border: 'none',
       cursor: 'pointer',
       color: '#666',
       fontSize: '1.5rem',
       transition: 'all 0.3s ease',
-      transform: 'scale(1)',
       padding: '5px',
       borderRadius: '50%',
+      zIndex: 1,
     },
     pasteButtonHover: {
       color: '#0096FF',
-      transform: 'scale(1.1)',
+      transform: 'translateY(-50%) scale(1.1)',
       backgroundColor: 'rgba(0, 150, 255, 0.1)',
     },
   };
 
-  // CSS animations
   const animations = `
     @keyframes fadeIn {
       from { opacity: 0; }
@@ -322,45 +322,47 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
 
           <div style={styles.inputGroup}>
             <label style={styles.label}>📍 Destination Address</label>
-            <input
-              type="text"
-              name="destination"
-              value={formData.destination}
-              onChange={handleInputChange}
-              placeholder="GXXXXX..."
-              style={styles.input}
-              onFocus={(e) => {
-                e.target.style.borderColor = styles.inputFocus.borderColor;
-                e.target.style.boxShadow = styles.inputFocus.boxShadow;
-                e.target.style.backgroundColor = styles.inputFocus.backgroundColor;
-                e.target.style.color = styles.inputFocus.color;
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = styles.input.borderColor;
-                e.target.style.boxShadow = 'none';
-                e.target.style.backgroundColor = styles.input.backgroundColor;
-                e.target.style.color = styles.input.color;
-              }}
-            />
-            <button
-              onClick={handlePaste}
-              className="paste-button"
-              style={styles.pasteButton}
-              onMouseEnter={(e) => {
-                e.target.style.color = styles.pasteButtonHover.color;
-                e.target.style.transform = styles.pasteButtonHover.transform;
-                e.target.style.backgroundColor = styles.pasteButtonHover.backgroundColor;
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.color = styles.pasteButton.color;
-                e.target.style.transform = styles.pasteButton.transform;
-                e.target.style.backgroundColor = 'transparent';
-              }}
-              title="Paste from clipboard"
-              aria-label="Paste"
-            >
-              📋
-            </button>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                name="destination"
+                value={formData.destination}
+                onChange={handleInputChange}
+                placeholder="GXXXXX..."
+                style={styles.input}
+                onFocus={(e) => {
+                  e.target.style.borderColor = styles.inputFocus.borderColor;
+                  e.target.style.boxShadow = styles.inputFocus.boxShadow;
+                  e.target.style.backgroundColor = styles.inputFocus.backgroundColor;
+                  e.target.style.color = styles.inputFocus.color;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = styles.input.borderColor;
+                  e.target.style.boxShadow = 'none';
+                  e.target.style.backgroundColor = styles.input.backgroundColor;
+                  e.target.style.color = styles.input.color;
+                }}
+              />
+              <button
+                onClick={handlePaste}
+                className="paste-button"
+                style={styles.pasteButton}
+                onMouseEnter={(e) => {
+                  e.target.style.color = styles.pasteButtonHover.color;
+                  e.target.style.transform = styles.pasteButtonHover.transform;
+                  e.target.style.backgroundColor = styles.pasteButtonHover.backgroundColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = styles.pasteButton.color;
+                  e.target.style.transform = 'translateY(-50%)';
+                  e.target.style.backgroundColor = 'transparent';
+                }}
+                title="Paste from clipboard"
+                aria-label="Paste"
+              >
+                📋
+              </button>
+            </div>
           </div>
 
           <div style={styles.inputGroup}>
