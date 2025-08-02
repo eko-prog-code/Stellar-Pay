@@ -87,23 +87,23 @@ class Start extends Component {
         </div>
 
         <div className="mt-8 w-full max-w-md bg-gray-800 p-6 rounded-xl shadow-lg">
-          <div className="flex justify-between items-center mb-2">
-            <label className="block text-sm font-medium">Private Key</label>
+          <label className="block text-sm font-medium mb-2">Private Key</label>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Enter your private key..."
+              value={this.state.privateKey}
+              onChange={(e) => this.onChange(e)}
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+            />
             <button 
               onClick={this.handlePaste}
-              className="flex items-center text-sm text-white hover:text-blue-400 transition-colors"
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-white hover:text-blue-400 transition-colors"
+              type="button"
             >
-              <span className="mr-1">📋</span>
-              Paste Private Key
+              📋
             </button>
           </div>
-          <input
-            type="text"
-            placeholder="Enter your private key..."
-            value={this.state.privateKey}
-            onChange={(e) => this.onChange(e)}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
 
           <div className="mt-6 flex flex-col space-y-5">
             <button className="w-full bg-blue-500 hover:bg-blue-400 px-4 py-2 rounded-md transition-colors" onClick={() => this.onSubmit(false)}>
