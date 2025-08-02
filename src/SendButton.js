@@ -20,6 +20,26 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
     });
   };
 
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setFormData({
+        ...formData,
+        destination: text,
+      });
+    } catch (error) {
+      console.error('Failed to read clipboard:', error);
+      // Fallback for browsers that don't support clipboard API
+      const text = window.prompt('Paste the destination address:');
+      if (text) {
+        setFormData({
+          ...formData,
+          destination: text,
+        });
+      }
+    }
+  };
+
   const handleSubmit = async () => {
     setStatus({ loading: true, error: '', success: '' });
     
@@ -120,6 +140,7 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
     },
     inputGroup: {
       marginBottom: '15px',
+      position: 'relative',
     },
     label: {
       display: 'block',
@@ -129,11 +150,12 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
     },
     input: {
       width: '100%',
-      padding: '10px 12px',
+      padding: '10px 40px 10px 12px',
       borderRadius: '6px',
       border: '1px solid #ddd',
       fontSize: '1rem',
       transition: 'border-color 0.2s ease-in-out',
+      boxSizing: 'border-box',
     },
     inputFocus: {
       borderColor: '#0096FF',
@@ -167,14 +189,19 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       color: '#666',
       marginBottom: '10px',
     },
-    input: {
-      width: '100%',
-      padding: '10px 12px', // Tambahkan padding-right di sini
-      borderRadius: '6px',
-      border: '1px solid #ddd',
-      fontSize: '1rem',
-      transition: 'border-color 0.2s ease-in-out',
-      boxSizing: 'border-box', // Pastikan padding tidak menambah lebar input
+    pasteButton: {
+      position: 'absolute',
+      right: '10px',
+      top: '32px',
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      color: '#666',
+      fontSize: '1.2rem',
+      transition: 'color 0.2s ease-in-out',
+    },
+    pasteButtonHover: {
+      color: '#0096FF',
     },
   };
 
@@ -228,6 +255,15 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
               onFocus={(e) => e.target.style.borderColor = styles.inputFocus.borderColor}
               onBlur={(e) => e.target.style.borderColor = styles.input.borderColor}
             />
+            <button
+              onClick={handlePaste}
+              style={styles.pasteButton}
+              onMouseEnter={(e) => e.target.style.color = styles.pasteButtonHover.color}
+              onMouseLeave={(e) => e.target.style.color = styles.pasteButton.color}
+              title="Paste from clipboard"
+            >
+              ⎘
+            </button>
           </div>
 
           <div style={styles.inputGroup}>
