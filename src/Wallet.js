@@ -9,17 +9,14 @@ class Wallet extends Component {
     super(props);
     this.state = {
       copySuccess: false,
-      xlmPriceUSD: 0,
-      usdToIdr: 0,
-      showInIDR: false,
-      scanResult: null,
       showScanner: false,
+      scanResult: null,
       qrSize: 200,
       scanError: null,
-      facingMode: { exact: "environment" }, // Default ke kamera belakang
+      facingMode: { exact: "environment" }, // Default to back camera
       hasBackCamera: true,
       cameraPermissionGranted: false,
-      addressCopied: false, // New state for tracking address copy
+      addressCopied: false,
     };
     this.scannerRef = React.createRef();
   }
@@ -27,8 +24,6 @@ class Wallet extends Component {
   componentDidMount() {
     const styleSheet = document.createElement("style");
     document.head.appendChild(styleSheet);
-    this.fetchXLMPrice();
-    this.fetchCurrencyRates();
     this.updateQrSize();
     window.addEventListener("resize", this.updateQrSize);
     this.checkCameraSupport();
@@ -40,11 +35,11 @@ class Wallet extends Component {
 
   checkCameraSupport = async () => {
     try {
-      // Cek izin kamera terlebih dahulu
+      // Check camera permission first
       await navigator.mediaDevices.getUserMedia({ video: true });
       this.setState({ cameraPermissionGranted: true });
 
-      // Enumerate devices untuk cek kamera belakang
+      // Enumerate devices to check for back camera
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(
         (device) => device.kind === "videoinput"
@@ -64,8 +59,7 @@ class Wallet extends Component {
     } catch (error) {
       console.error("Camera check error:", error);
       this.setState({
-        scanError:
-          "Tidak dapat mengakses kamera. Pastikan izin kamera diberikan.",
+        scanError: "Cannot access camera. Please ensure camera permission is granted.",
         cameraPermissionGranted: false,
       });
     }
@@ -77,35 +71,11 @@ class Wallet extends Component {
     this.setState({ qrSize: size });
   };
 
-  fetchXLMPrice = async () => {
-    try {
-      const response = await fetch("https://api.coincap.io/v2/assets/stellar");
-      const data = await response.json();
-      this.setState({ xlmPriceUSD: parseFloat(data.data.priceUsd) });
-    } catch (error) {
-      console.error("Error fetching XLM price:", error);
-    }
-  };
-
-  fetchCurrencyRates = async () => {
-    try {
-      const response = await fetch("https://open.er-api.com/v6/latest/USD");
-      const data = await response.json();
-      this.setState({ usdToIdr: data.rates.IDR });
-    } catch (error) {
-      console.error("Error fetching currency rates:", error);
-    }
-  };
-
   copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
       this.setState({ copySuccess: true, addressCopied: true });
       setTimeout(() => this.setState({ copySuccess: false, addressCopied: false }), 2000);
     });
-  };
-
-  toggleCurrency = () => {
-    this.setState((prevState) => ({ showInIDR: !prevState.showInIDR }));
   };
 
   handleScan = (data) => {
@@ -120,12 +90,11 @@ class Wallet extends Component {
             showScanner: false,
           });
         } else {
-          throw new Error("Format alamat Stellar tidak valid");
+          throw new Error("Invalid Stellar address format");
         }
       } catch (error) {
         this.setState({
-          scanError:
-            "QR code tidak valid. Harap scan alamat Stellar (dimulai dengan G, 56 karakter)",
+          scanError: "Invalid QR code. Please scan a Stellar address (starts with G, 56 characters)",
           scanResult: null,
         });
       }
@@ -135,19 +104,16 @@ class Wallet extends Component {
   handleError = (err) => {
     console.error("Camera Error:", err);
 
-    if (
-      err.name === "OverconstrainedError" &&
-      err.constraint === "facingMode"
-    ) {
-      // Jika kamera belakang tidak tersedia, beralih ke kamera depan
+    if (err.name === "OverconstrainedError" && err.constraint === "facingMode") {
+      // If back camera not available, switch to front camera
       this.setState({
         facingMode: "user",
         hasBackCamera: false,
-        scanError: "Kamera belakang tidak tersedia, beralih ke kamera depan",
+        scanError: "Back camera not available, switching to front camera",
       });
     } else {
       this.setState({
-        scanError: "Gagal mengakses kamera. Pastikan izin kamera diberikan.",
+        scanError: "Failed to access camera. Please ensure camera permission is granted.",
       });
     }
   };
@@ -155,7 +121,7 @@ class Wallet extends Component {
   toggleScanner = () => {
     if (!this.state.cameraPermissionGranted) {
       this.setState({
-        scanError: "Izin kamera diperlukan untuk scanning QR code",
+        scanError: "Camera permission required for QR code scanning",
       });
       return;
     }
@@ -184,9 +150,6 @@ class Wallet extends Component {
     const xlmBalance = mainBalance ? mainBalance.balance : "0";
     const stellarchainBaseUrl = `https://stellarchain.io/accounts/${this.props.publicKey}`;
     const {
-      xlmPriceUSD,
-      usdToIdr,
-      showInIDR,
       scanResult,
       showScanner,
       qrSize,
@@ -195,16 +158,6 @@ class Wallet extends Component {
       hasBackCamera,
       addressCopied,
     } = this.state;
-
-    const balanceInUSD = xlmBalance * xlmPriceUSD;
-    const balanceInIDR = balanceInUSD * usdToIdr;
-
-    const displayedBalance = showInIDR
-      ? balanceInIDR.toLocaleString("id-ID", {
-          style: "currency",
-          currency: "IDR",
-        })
-      : `$${balanceInUSD.toFixed(2)}`;
 
     return (
       <div className="wallet-container">
@@ -221,7 +174,7 @@ class Wallet extends Component {
               level="H"
               includeMargin={true}
             />
-            <p className="qr-code-label">Scan untuk menerima alamat Stellar</p>
+            <p className="qr-code-label">Scan to receive Stellar address</p>
           </div>
         </div>
 
@@ -239,7 +192,7 @@ class Wallet extends Component {
             target="_blank"
             rel="noopener noreferrer"
             className="stellarchain-link"
-            title="Lihat di Stellarchain"
+            title="View on Stellarchain"
           >
             🔗
           </a>
@@ -256,7 +209,7 @@ class Wallet extends Component {
             className="button button-secondary"
             onClick={this.toggleScanner}
           >
-            {showScanner ? "❌ Tutup Scanner" : "📷 Scan QR Code"}
+            {showScanner ? "❌ Close Scanner" : "📷 Scan QR Code"}
           </button>
         </div>
 
@@ -282,13 +235,13 @@ class Wallet extends Component {
                   onClick={this.toggleCamera}
                 >
                   {facingMode.exact === "environment"
-                    ? "📱 Kamera Depan"
-                    : "📷 Kamera Belakang"}
+                    ? "📱 Front Camera"
+                    : "📷 Back Camera"}
                 </button>
               )}
             </div>
             <p className="scanner-instruction">
-              Arahkan kamera ke QR Code Stellar
+              Point camera at Stellar QR Code
             </p>
             {scanError && <p className="scan-error">{scanError}</p>}
           </div>
@@ -296,11 +249,11 @@ class Wallet extends Component {
 
         {scanResult && (
           <div className="scan-result-section">
-            <h4>Alamat Stellar yang Di-scan:</h4>
+            <h4>Scanned Stellar Address:</h4>
             <div className="scan-result-text">{scanResult}</div>
             {addressCopied && (
               <div className="copy-success-message">
-                Alamat berhasil di salin!
+                Address copied successfully!
               </div>
             )}
             <div className="scan-result-actions">
@@ -308,17 +261,17 @@ class Wallet extends Component {
                 className="button button-primary"
                 onClick={() => this.copyToClipboard(scanResult)}
               >
-                Salin Alamat
+                Copy Address
               </button>
               <button
                 className="button button-secondary"
                 onClick={() => this.setState({ scanResult: null })}
               >
-                Tutup Bro !
+                Close
               </button>
             </div>
             <p className="scan-hint">
-              Alamat telah dinormalisasi ke format standar Stellar
+              Address has been normalized to standard Stellar format
             </p>
           </div>
         )}
@@ -326,15 +279,8 @@ class Wallet extends Component {
         <div className="balance-card">
           <div className="balance-header">
             <span className="asset-code">XLM</span>
-            <button
-              className="currency-toggle-button"
-              onClick={this.toggleCurrency}
-            >
-              {showInIDR ? "Switch to USD" : "Switch to IDR"}
-            </button>
           </div>
           <div className="balance-amount">{xlmBalance}</div>
-          <div className="converted-balance">{displayedBalance}</div>
           <SendButton
             native={true}
             assetCode="XLM"
