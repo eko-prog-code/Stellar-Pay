@@ -235,7 +235,7 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       position: 'absolute',
       right: '12px',
       top: '50%',
-      transform: translateY(calc(-50% - 12px)),
+      transform: 'translateY(calc(-50% - 12px))',
       background: 'none',
       border: 'none',
       cursor: 'pointer',
