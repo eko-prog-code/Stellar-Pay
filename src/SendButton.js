@@ -279,6 +279,8 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       pasteButton: {
         right: '10px',
         fontSize: '1rem',
+        top: '38%',
+        transform: 'translateY(-50%)', 
       }
     }
   };
