@@ -21,26 +21,28 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
     });
   };
 
-  const handlePaste = async () => {
+  const handlePaste = async (field) => {
     try {
       const text = await navigator.clipboard.readText();
       setFormData({
         ...formData,
-        destination: text,
+        [field]: text,
       });
       
-      const pasteBtn = document.querySelector('.paste-button');
-      pasteBtn.innerHTML = '✓';
-      setTimeout(() => {
-        pasteBtn.innerHTML = '📋';
-      }, 1000);
+      const pasteBtn = document.querySelector(`.paste-button-${field}`);
+      if (pasteBtn) {
+        pasteBtn.innerHTML = '✓';
+        setTimeout(() => {
+          pasteBtn.innerHTML = '📋';
+        }, 1000);
+      }
     } catch (error) {
       console.error('Failed to read clipboard:', error);
-      const text = window.prompt('Paste the destination address:');
+      const text = window.prompt(`Paste the ${field}:`);
       if (text) {
         setFormData({
           ...formData,
-          destination: text,
+          [field]: text,
         });
       }
     }
@@ -144,28 +146,28 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       flex: 1,
     },
     closeButton: {
-    position: 'absolute',
-    top: '10px',
-    right: '10px',
-    width: '32px',
-    height: '32px',
-    backgroundColor: 'rgba(128, 128, 128, 0.2)', // abu-abu transparan
-    borderRadius: '50%',
-    border: 'none',
-    color: '#ff4757', // merah
-    fontSize: '1.2rem',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'all 0.3s ease',
-    zIndex: 10,
-   },
+      position: 'absolute',
+      top: '10px',
+      right: '10px',
+      width: '32px',
+      height: '32px',
+      backgroundColor: 'rgba(128, 128, 128, 0.2)',
+      borderRadius: '50%',
+      border: 'none',
+      color: '#ff4757',
+      fontSize: '1.2rem',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      transition: 'all 0.3s ease',
+      zIndex: 10,
+    },
     closeButtonHover: {
-    transform: 'scale(1.1) rotate(90deg)',
-    backgroundColor: 'rgba(255, 71, 87, 0.15)',
-    color: '#ff6b81',
-  },
+      transform: 'scale(1.1) rotate(90deg)',
+      backgroundColor: 'rgba(255, 71, 87, 0.15)',
+      color: '#ff6b81',
+    },
     inputGroup: {
       marginBottom: '20px',
       position: 'relative',
@@ -241,14 +243,14 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
       position: 'absolute',
       right: '12px',
       top: '50%',
-      transform: 'translateY(calc(-50% - 24px))',
+      transform: 'translateY(-50%)',
       background: 'none',
       border: 'none',
       cursor: 'pointer',
       color: '#666',
-      fontSize: '1.5rem', // Diperbesar dari 1.2rem
-      width: '32px', // Lebar tetap
-      height: '32px', // Tinggi tetap
+      fontSize: '1.2rem',
+      width: '32px',
+      height: '32px',
       transition: 'all 0.3s ease',
       padding: '5px',
       borderRadius: '50%',
@@ -407,8 +409,8 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
                 }}
               />
               <button
-                onClick={handlePaste}
-                className="paste-button"
+                onClick={() => handlePaste('destination')}
+                className="paste-button-destination"
                 style={currentStyles.pasteButton}
                 onMouseEnter={(e) => {
                   e.target.style.color = currentStyles.pasteButtonHover.color;
@@ -456,26 +458,47 @@ const SendXLMModal = ({ server, pair, refreshBalances, balance }) => {
 
           <div style={currentStyles.inputGroup}>
             <label style={currentStyles.label}>📝 Memo (Optional)</label>
-            <input
-              type="text"
-              name="memo"
-              value={formData.memo}
-              onChange={handleInputChange}
-              placeholder="Add a message..."
-              style={currentStyles.input}
-              onFocus={(e) => {
-                e.target.style.borderColor = currentStyles.inputFocus.borderColor;
-                e.target.style.boxShadow = currentStyles.inputFocus.boxShadow;
-                e.target.style.backgroundColor = currentStyles.inputFocus.backgroundColor;
-                e.target.style.color = currentStyles.inputFocus.color;
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = currentStyles.input.borderColor;
-                e.target.style.boxShadow = 'none';
-                e.target.style.backgroundColor = currentStyles.input.backgroundColor;
-                e.target.style.color = currentStyles.input.color;
-              }}
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                name="memo"
+                value={formData.memo}
+                onChange={handleInputChange}
+                placeholder="Add a message..."
+                style={currentStyles.input}
+                onFocus={(e) => {
+                  e.target.style.borderColor = currentStyles.inputFocus.borderColor;
+                  e.target.style.boxShadow = currentStyles.inputFocus.boxShadow;
+                  e.target.style.backgroundColor = currentStyles.inputFocus.backgroundColor;
+                  e.target.style.color = currentStyles.inputFocus.color;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = currentStyles.input.borderColor;
+                  e.target.style.boxShadow = 'none';
+                  e.target.style.backgroundColor = currentStyles.input.backgroundColor;
+                  e.target.style.color = currentStyles.input.color;
+                }}
+              />
+              <button
+                onClick={() => handlePaste('memo')}
+                className="paste-button-memo"
+                style={currentStyles.pasteButton}
+                onMouseEnter={(e) => {
+                  e.target.style.color = currentStyles.pasteButtonHover.color;
+                  e.target.style.transform = currentStyles.pasteButtonHover.transform;
+                  e.target.style.backgroundColor = currentStyles.pasteButtonHover.backgroundColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = currentStyles.pasteButton.color;
+                  e.target.style.transform = 'translateY(-50%)';
+                  e.target.style.backgroundColor = 'transparent';
+                }}
+                title="Paste from clipboard"
+                aria-label="Paste"
+              >
+                📋
+              </button>
+            </div>
           </div>
 
           <button
